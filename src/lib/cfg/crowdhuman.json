@@ -1,9 +1,9 @@
 {
-    "root":"/data/yfzhang/MOT/JDE",
+    "root":"",
     "train":
     {
-        "crowdhuman_train":"./data/crowdhuman.train",
-        "crowdhuman_test":"./data/crowdhuman.val"
+        "crowdhuman_train":"/data/crowdhuman.train",
+        "crowdhuman_test":"/data/crowdhuman.val"
     },
     "test_emb":
     {
