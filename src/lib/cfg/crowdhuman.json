@@ -1,9 +1,9 @@
 {
-    "root":"",
+    "root":"/data/mot",
     "train":
     {
-        "crowdhuman_train":"/data/crowdhuman.train",
-        "crowdhuman_test":"/data/crowdhuman.val"
+        "crowdhuman_train":"crowdhuman.train",
+        "crowdhuman_test":"crowdhuman.val"
     },
     "test_emb":
     {

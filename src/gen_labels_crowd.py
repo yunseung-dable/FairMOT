@@ -37,7 +37,7 @@ def gen_labels_crowd(data_root, label_root, ann_root):
         for i in range(len(anns)):
             if 'extra' in anns[i] and 'ignore' in anns[i]['extra'] and anns[i]['extra']['ignore'] == 1:
                 continue
-            x, y, w, h = anns[i]['fbox']
+            x, y, w, h = anns[i]['hbox']
             x += w / 2
             y += h / 2
             label_fpath = img_path.replace('images', 'labels_with_ids').replace('.png', '.txt').replace('.jpg', '.txt')
@@ -49,12 +49,12 @@ def gen_labels_crowd(data_root, label_root, ann_root):
 
 
 if __name__ == '__main__':
-    data_val = '/data/yfzhang/MOT/JDE/crowdhuman/images/val'
-    label_val = '/data/yfzhang/MOT/JDE/crowdhuman/labels_with_ids/val'
-    ann_val = '/data/yfzhang/MOT/JDE/crowdhuman/annotation_val.odgt'
-    data_train = '/data/yfzhang/MOT/JDE/crowdhuman/images/train'
-    label_train = '/data/yfzhang/MOT/JDE/crowdhuman/labels_with_ids/train'
-    ann_train = '/data/yfzhang/MOT/JDE/crowdhuman/annotation_train.odgt'
+    data_val = '/data/mot/crowdhuman/images/val'
+    label_val = '/data/mot/crowdhuman/labels_with_ids/val'
+    ann_val = '/data/mot/crowdhuman/annotation_val.odgt'
+    data_train = '/data/mot/crowdhuman/images/train'
+    label_train = '/data/mot/crowdhuman/labels_with_ids/train'
+    ann_train = '/data/mot/crowdhuman/annotation_train.odgt'
     gen_labels_crowd(data_train, label_train, ann_train)
     gen_labels_crowd(data_val, label_val, ann_val)
 
