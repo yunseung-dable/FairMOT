@@ -16,7 +16,8 @@ from models.data_parallel import DataParallel
 from logger import Logger
 from datasets.dataset_factory import get_dataset
 from trains.train_factory import train_factory
-
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 
 def main(opt):
     torch.manual_seed(opt.seed)
