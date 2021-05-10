@@ -2,7 +2,7 @@
     "root":"/root/docker/FairMOT",
     "train":
     {
-        "crowdhuman_train":"./data/crowdfund.train",
+        "crowdhuman_train":"./data/crowdhuman.train",
         "crowdhuman_test":"./data/crowdhuman.val"
     },
     "test_emb":
