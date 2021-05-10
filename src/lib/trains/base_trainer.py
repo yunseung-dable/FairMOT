@@ -59,8 +59,9 @@ class BaseTrainer(object):
     num_iters = len(data_loader) if opt.num_iters < 0 else opt.num_iters
     bar = Bar('{}/{}'.format(opt.task, opt.exp_id), max=num_iters)
     end = time.time()
-    print('pass residue')
+
     for iter_id, batch in enumerate(data_loader):
+      print(batch)
       if iter_id >= num_iters:
         break
       data_time.update(time.time() - end)
