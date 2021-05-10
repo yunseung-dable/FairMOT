@@ -17,6 +17,7 @@ class ModleWithLoss(torch.nn.Module):
   
   def forward(self, batch):
     print('before input')
+    print(f'Model architecture : {self.model}')
     outputs = self.model(batch['input'])
     print('after input')
     loss, loss_stats = self.loss(outputs, batch)
