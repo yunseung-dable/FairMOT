@@ -1,5 +1,5 @@
 {
-    "root":"/root/docker/FairMOT",
+    "root":"/data/mot",
     "train":
     {
         "crowdhuman_train":"./data/crowdhuman.train",
