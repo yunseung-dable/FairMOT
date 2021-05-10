@@ -61,7 +61,7 @@ class BaseTrainer(object):
     end = time.time()
 
     for iter_id, batch in enumerate(data_loader):
-      print(batch)
+
       if iter_id >= num_iters:
         break
       data_time.update(time.time() - end)
@@ -69,7 +69,7 @@ class BaseTrainer(object):
       for k in batch:
         if k != 'meta':
           batch[k] = batch[k].to(device=opt.device, non_blocking=True)
-
+      print('before loss stage')
       output, loss, loss_stats = model_with_loss(batch)
       loss = loss.mean()
       if phase == 'train':
