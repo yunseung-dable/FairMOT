@@ -16,8 +16,11 @@ class ModleWithLoss(torch.nn.Module):
     self.loss = loss
   
   def forward(self, batch):
+    print('before input')
     outputs = self.model(batch['input'])
+    print('after input')
     loss, loss_stats = self.loss(outputs, batch)
+    print('after calculated loss')
     return outputs[-1], loss, loss_stats
 
 class BaseTrainer(object):
@@ -71,7 +74,6 @@ class BaseTrainer(object):
           batch[k] = batch[k].to(device=opt.device, non_blocking=True)
 
       output, loss, loss_stats = model_with_loss(batch)
-      print('after loss calculated')
       loss = loss.mean()
       if phase == 'train':
         self.optimizer.zero_grad()
