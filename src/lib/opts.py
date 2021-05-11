@@ -88,7 +88,7 @@ class opts(object):
                                   'test on test set')
 
     # test
-    self.parser.add_argument('--K', type=int, default=700,
+    self.parser.add_argument('--K', type=int, default=1000,
                              help='max number of output objects.') 
     self.parser.add_argument('--not_prefetch_test', action='store_true',
                              help='not use parallal data pre-processing.')
@@ -124,7 +124,7 @@ class opts(object):
     self.parser.add_argument('--data_cfg', type=str,
                              default='../src/lib/cfg/data.json',
                              help='load data from cfg')
-    self.parser.add_argument('--data_dir', type=str, default='/root/docker/FairMOT')
+    self.parser.add_argument('--data_dir', type=str, default='/root/FairMOT')
 
     # loss
     self.parser.add_argument('--mse_loss', action='store_true',
