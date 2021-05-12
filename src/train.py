@@ -17,6 +17,7 @@ from logger import Logger
 from datasets.dataset_factory import get_dataset
 from trains.train_factory import train_factory
 import warnings
+import gc
 warnings.filterwarnings("ignore", category=UserWarning)
 
 def main(opt):
@@ -92,6 +93,7 @@ def main(opt):
                        epoch, model, optimizer)
 
         torch.cuda.empty_cache()
+        gc.collect()
     logger.close()
 
 
