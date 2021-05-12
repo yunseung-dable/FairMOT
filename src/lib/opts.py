@@ -27,7 +27,7 @@ class opts(object):
     # system
     self.parser.add_argument('--gpus', default='0, 1',
                              help='-1 for CPU, use comma for multiple gpus')
-    self.parser.add_argument('--num_workers', type=int, default=0,
+    self.parser.add_argument('--num_workers', type=int, default=3,
                              help='dataloader threads. 0 for single-thread.')
     self.parser.add_argument('--not_cuda_benchmark', action='store_true',
                              help='disable when the input size is not fixed.')
@@ -88,7 +88,7 @@ class opts(object):
                                   'test on test set')
 
     # test
-    self.parser.add_argument('--K', type=int, default=1000,
+    self.parser.add_argument('--K', type=int, default=800,
                              help='max number of output objects.') 
     self.parser.add_argument('--not_prefetch_test', action='store_true',
                              help='not use parallal data pre-processing.')

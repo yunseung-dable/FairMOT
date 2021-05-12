@@ -18,7 +18,7 @@ from datasets.dataset_factory import get_dataset
 from trains.train_factory import train_factory
 import warnings
 import gc
-warnings.filterwarnings("ignore", category=UserWarning)
+# warnings.filterwarnings("ignore", category=UserWarning)
 
 def main(opt):
     torch.manual_seed(opt.seed)
@@ -51,7 +51,7 @@ def main(opt):
     train_loader = torch.utils.data.DataLoader(
         dataset,
         batch_size=opt.batch_size,
-        shuffle=True,
+        shuffle=False,
         num_workers=opt.num_workers,
         pin_memory=False,
         drop_last=True
