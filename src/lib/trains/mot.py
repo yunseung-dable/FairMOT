@@ -86,9 +86,9 @@ class MotTrainer(BaseTrainer):
         dets = mot_decode(
             output['hm'], output['wh'], reg=reg,
             cat_spec_wh=self.opt.cat_spec_wh, K=self.opt.K)
-        dets = dets.detach().cpu().numpy().reshape(1, -1, dets.shape[2])
+        dets = dets.cpu().detach().numpy().reshape(1, -1, dets.shape[2])
         dets_out = ctdet_post_process(
             dets.copy(), batch['meta']['c'].cpu().numpy(),
-            batch['meta']['s'].cpu().numpy(),
+            batch['meta']['s'].cpu().detach().numpy(),
             output['hm'].shape[2], output['hm'].shape[3], output['hm'].shape[1])
         results[batch['meta']['img_id'].cpu().numpy()[0]] = dets_out[0]

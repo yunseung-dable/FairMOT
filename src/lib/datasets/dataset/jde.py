@@ -427,6 +427,11 @@ class JointDataset(LoadImagesAndLabels):  # for training
         output_w = imgs.shape[2] // self.opt.down_ratio
         num_classes = self.num_classes
         num_objs = labels.shape[0]
+
+        #####
+        if num_objs > self.max_objs :
+            num_objs = self.max_objs
+        ####
         hm = np.zeros((num_classes, output_h, output_w), dtype=np.float32)
         if self.opt.ltrb:
             wh = np.zeros((self.max_objs, 4), dtype=np.float32)
@@ -471,7 +476,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 ct_int = ct.astype(np.int32)
                 draw_gaussian(hm[cls_id], ct_int, radius)
                 if self.opt.ltrb:
-                    print(f'the number of ct[0] : {ct[0]}')
+
                     wh[k] = ct[0] - bbox_amodal[0], ct[1] - bbox_amodal[1], \
                             bbox_amodal[2] - ct[0], bbox_amodal[3] - ct[1]
                 else:
