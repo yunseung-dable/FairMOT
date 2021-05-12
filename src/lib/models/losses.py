@@ -143,8 +143,8 @@ class RegL1Loss(nn.Module):
   def forward(self, output, mask, ind, target):
     pred = _tranpose_and_gather_feat(output, ind)
     mask = mask.unsqueeze(2).expand_as(pred).float()
-    loss = F.l1_loss(pred * mask, target * mask, reduction='none')
-    # loss = F.l1_loss(pred * mask, target * mask, size_average=False)
+    # loss = F.l1_loss(pred * mask, target * mask, reduction='none')
+    loss = F.l1_loss(pred * mask, target * mask, size_average=False)
     loss = loss / (mask.sum() + 1e-4)
     return loss
 
@@ -157,8 +157,8 @@ class NormRegL1Loss(nn.Module):
     mask = mask.unsqueeze(2).expand_as(pred).float()
     pred = pred / (target + 1e-4)
     target = target * 0 + 1
-    loss = F.l1_loss(pred * mask, target * mask, reduction='none')
-    # loss = F.l1_loss(pred * mask, target * mask, size_average=False)
+    # loss = F.l1_loss(pred * mask, target * mask, reduction='none')
+    loss = F.l1_loss(pred * mask, target * mask, size_average=False)
     loss = loss / (mask.sum() + 1e-4)
     return loss
 
@@ -169,8 +169,8 @@ class RegWeightedL1Loss(nn.Module):
   def forward(self, output, mask, ind, target):
     pred = _tranpose_and_gather_feat(output, ind)
     mask = mask.float()
-    loss = F.l1_loss(pred * mask, target * mask, reduction='none')
-    # loss = F.l1_loss(pred * mask, target * mask, size_average=False)
+    # loss = F.l1_loss(pred * mask, target * mask, reduction='none')
+    loss = F.l1_loss(pred * mask, target * mask, size_average=False)
     loss = loss / (mask.sum() + 1e-4)
     return loss
 
