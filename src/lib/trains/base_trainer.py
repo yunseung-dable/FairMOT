@@ -7,6 +7,7 @@ import torch
 from progress.bar import Bar
 from models.data_parallel import DataParallel
 from utils.utils import AverageMeter
+import gc
 
 
 class ModleWithLoss(torch.nn.Module):
@@ -51,6 +52,7 @@ class BaseTrainer(object):
         model_with_loss = self.model_with_loss.module
       model_with_loss.eval()
       torch.cuda.empty_cache()
+
 
     opt = self.opt
     results = {}
@@ -99,7 +101,9 @@ class BaseTrainer(object):
       if opt.test:
         self.save_result(output, batch, results)
       del output, loss, loss_stats, batch
-    
+      torch.cuda.empty_cache()
+      gc.collect()
+
     bar.finish()
     ret = {k: v.avg for k, v in avg_loss_stats.items()}
     ret['time'] = bar.elapsed_td.total_seconds() / 60.
