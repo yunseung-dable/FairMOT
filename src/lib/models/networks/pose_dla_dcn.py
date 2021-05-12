@@ -291,8 +291,8 @@ class DLA(nn.Module):
         for i in range(6):
             x = getattr(self, 'level{}'.format(i))(x)
             y.append(x)
-            ######
-            del x
+        ######
+        del x
         return y
 
     def load_pretrained_model(self, data='imagenet', name='dla34', hash='ba72cf86'):
