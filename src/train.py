@@ -90,6 +90,8 @@ def main(opt):
         if epoch % 5 == 0 or epoch >= 25:
             save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(epoch)),
                        epoch, model, optimizer)
+
+        torch.cuda.empty_cache()
     logger.close()
 
 
