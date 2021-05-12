@@ -218,6 +218,8 @@ class Tree(nn.Module):
         else:
             children.append(x1)
             x = self.tree2(x1, children=children)
+        ######
+        del x1, x2
         return x
 
 
@@ -289,6 +291,8 @@ class DLA(nn.Module):
         for i in range(6):
             x = getattr(self, 'level{}'.format(i))(x)
             y.append(x)
+            ######
+            del x
         return y
 
     def load_pretrained_model(self, data='imagenet', name='dla34', hash='ba72cf86'):
@@ -473,12 +477,14 @@ class DLASeg(nn.Module):
 
         y = []
         for i in range(self.last_level - self.first_level):
-            y.append(x[i].detach().cpu())
+            y.append(x[i].detach().clone())
         self.ida_up(y, 0, len(y))
 
         z = {}
         for head in self.heads:
             z[head] = self.__getattr__(head)(y[-1])
+        ######
+        del x, y
         return [z]
     
 
