@@ -23,7 +23,7 @@ class opts(object):
                                   'Reloaded the optimizer parameter and '
                                   'set load_model to model_last.pth '
                                   'in the exp dir if load_model is empty.') 
-ß
+
     # system
     self.parser.add_argument('--gpus', default='0, 1',
                              help='-1 for CPU, use comma for multiple gpus')
