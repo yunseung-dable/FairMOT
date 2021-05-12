@@ -219,7 +219,7 @@ class Tree(nn.Module):
             children.append(x1)
             x = self.tree2(x1, children=children)
         ######
-        del x1, x2
+        del x1
         return x
 
 
