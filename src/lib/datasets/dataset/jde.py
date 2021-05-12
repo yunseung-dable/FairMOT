@@ -471,6 +471,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 ct_int = ct.astype(np.int32)
                 draw_gaussian(hm[cls_id], ct_int, radius)
                 if self.opt.ltrb:
+                    print(f'the number of ct[0] : {ct[0]}')
                     wh[k] = ct[0] - bbox_amodal[0], ct[1] - bbox_amodal[1], \
                             bbox_amodal[2] - ct[0], bbox_amodal[3] - ct[1]
                 else:
