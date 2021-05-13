@@ -392,7 +392,9 @@ class JointDataset(LoadImagesAndLabels):  # for training
 
         self.nID = int(last_index + 1)
         self.nds = [len(x) for x in self.img_files.values()]
+        print(f'what is nds : {self.nds}')
         self.cds = [sum(self.nds[:i]) for i in range(len(self.nds))]
+        print(f'then what is cds : {self.cds}')
         self.nF = sum(self.nds)
         self.width = img_size[0]
         self.height = img_size[1]

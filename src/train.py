@@ -26,6 +26,9 @@ def main(opt):
 
     print('Setting up data...')
     Dataset = get_dataset(opt.dataset, opt.task)
+    # n_dataset = len(DataParallel)
+    # Dataset_train, Dataset_test = Dataset[: int(n_dataset * 0.8)], Dataset[int(n_dataset * 0.8):]
+
     f = open(opt.data_cfg)
     data_config = json.load(f)
     trainset_paths = data_config['train']
@@ -47,9 +50,6 @@ def main(opt):
     start_epoch = 0
 
     # Get dataloader
-    n_dataset = len(dataset)
-    print(f'this is dataset0 : {dataset[:2]}')
-    dataset_train, dataset_test = dataset[ : int(n_dataset * 0.8)], dataset[int(n_dataset * 0.8) : ]
 
     train_loader = torch.utils.data.DataLoader(
         dataset_train,
