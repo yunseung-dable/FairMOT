@@ -48,7 +48,8 @@ def main(opt):
 
     # Get dataloader
     n_dataset = len(dataset)
-    dataset_train , dataset_test = dataset[:int(n_dataset * 0.8)], dataset[int(n_dataset * 0.8) : ]
+    print(f'this is n_dataset : {n_dataset}')
+    dataset_train, dataset_test = dataset[ : int(n_dataset * 0.8)], dataset[int(n_dataset * 0.8) : ]
 
     train_loader = torch.utils.data.DataLoader(
         dataset_train,
