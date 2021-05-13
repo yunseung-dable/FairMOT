@@ -18,7 +18,7 @@ class opts(object):
                              #help='path to pretrained model')
     self.parser.add_argument('--load_model', default='',
                              help='path to pretrained model')
-    self.parser.add_argument('--resume', action='store_true',
+    self.parser.add_argument('--resume', default='store_true',
                              help='resume an experiment. '
                                   'Reloaded the optimizer parameter and '
                                   'set load_model to model_last.pth '
