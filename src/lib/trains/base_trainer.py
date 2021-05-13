@@ -45,15 +45,6 @@ class BaseTrainer(object):
           state[k] = v.to(device=device, non_blocking=False)
 
   def run_epoch(self, phase, epoch, data_loader):
-    model_with_loss = self.model_with_loss
-    if phase == 'train':
-      model_with_loss.train()
-    else:
-      if len(self.opt.gpus) > 1:
-        model_with_loss = self.model_with_loss.module
-      model_with_loss.eval()
-      torch.cuda.empty_cache()
-
 
     opt = self.opt
     results = {}
@@ -62,6 +53,16 @@ class BaseTrainer(object):
     num_iters = len(data_loader) if opt.num_iters < 0 else opt.num_iters
     bar = Bar('{}/{}'.format(opt.task, opt.exp_id), max=num_iters)
     end = time.time()
+
+    model_with_loss = self.model_with_loss
+    if phase == 'train':
+      model_with_loss.train()
+    else:
+      if len(self.opt.gpus) > 1:
+        model_with_loss = self.model_with_loss.module
+      model_with_loss.eval()
+      torch.cuda.empty_cache()
+      num_iters = 100
 
     for iter_id, batch in enumerate(data_loader):
 
@@ -126,3 +127,6 @@ class BaseTrainer(object):
 
   def train(self, epoch, data_loader):
     return self.run_epoch('train', epoch, data_loader)
+
+  def valid(self, epoch, data_loader):
+    return self.run_epoch('val', epoch, data_loader)
