@@ -47,9 +47,20 @@ def main(opt):
     start_epoch = 0
 
     # Get dataloader
+    n_dataset = len(dataset)
+    dataset_train , dataset_test = dataset[:int(n_dataset * 0.8)], dataset[int(n_dataset * 0.8) : ]
 
     train_loader = torch.utils.data.DataLoader(
-        dataset,
+        dataset_train,
+        batch_size=opt.batch_size,
+        shuffle=True,
+        num_workers=opt.num_workers,
+        pin_memory=True,
+        drop_last=True
+    )
+
+    test_loader = torch.utils.data.DataLoader(
+        dataset_test,
         batch_size=opt.batch_size,
         shuffle=True,
         num_workers=opt.num_workers,
@@ -75,6 +86,11 @@ def main(opt):
             logger.write('{} {:8f} | '.format(k, v))
 
         if opt.val_intervals > 0 and epoch % opt.val_intervals == 0:
+
+            log_dict_test, _ = trainer.train(epoch, test_loader)
+            for k, v in log_dict_test.items():
+                logger.scalar_summary('test_{}'.format(k), v, epoch)
+                logger.write('{} {:8f} | '.format(k, v))
             save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(mark)),
                        epoch, model, optimizer)
         else:
