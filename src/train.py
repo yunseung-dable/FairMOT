@@ -52,22 +52,22 @@ def main(opt):
     # Get dataloader
 
     train_loader = torch.utils.data.DataLoader(
-        dataset_train,
+        dataset,
         batch_size=opt.batch_size,
         shuffle=True,
         num_workers=opt.num_workers,
         pin_memory=True,
         drop_last=True
     )
-
-    test_loader = torch.utils.data.DataLoader(
-        dataset_test,
-        batch_size=opt.batch_size,
-        shuffle=True,
-        num_workers=opt.num_workers,
-        pin_memory=True,
-        drop_last=True
-    )
+    #
+    # test_loader = torch.utils.data.DataLoader(
+    #     dataset_test,
+    #     batch_size=opt.batch_size,
+    #     shuffle=True,
+    #     num_workers=opt.num_workers,
+    #     pin_memory=True,
+    #     drop_last=True
+    # )
 
     print('Starting training...')
     Trainer = train_factory[opt.task]
