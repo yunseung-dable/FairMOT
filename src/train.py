@@ -32,10 +32,12 @@ def main(opt):
     f = open(opt.data_cfg)
     data_config = json.load(f)
     trainset_paths = data_config['train']
+    validset_paths = data_config['valid']
     dataset_root = data_config['root']
     f.close()
     transforms = T.Compose([T.ToTensor()])
-    dataset = Dataset(opt, dataset_root, trainset_paths, (1088, 608), augment=True, transforms=transforms)
+    dataset_train = Dataset(opt, dataset_root, trainset_paths, (1088, 608), augment=True, transforms=transforms)
+    dataset_val = Dataset(opt, dataset_root, validset_paths, (1088, 608), augment=False, transforms=transforms)
     opt = opts().update_dataset_info_and_set_heads(opt, dataset)
     print(opt)
 
@@ -52,22 +54,22 @@ def main(opt):
     # Get dataloader
 
     train_loader = torch.utils.data.DataLoader(
-        dataset,
+        dataset_train,
         batch_size=opt.batch_size,
         shuffle=True,
         num_workers=opt.num_workers,
         pin_memory=True,
         drop_last=True
     )
-    #
-    # test_loader = torch.utils.data.DataLoader(
-    #     dataset_test,
-    #     batch_size=opt.batch_size,
-    #     shuffle=True,
-    #     num_workers=opt.num_workers,
-    #     pin_memory=True,
-    #     drop_last=True
-    # )
+
+    val_loader = torch.utils.data.DataLoader(
+        dataset_val,
+        batch_size=opt.batch_size,
+        shuffle=True,
+        num_workers=opt.num_workers,
+        pin_memory=True,
+        drop_last=True
+    )
 
     print('Starting training...')
     Trainer = train_factory[opt.task]
@@ -88,10 +90,10 @@ def main(opt):
 
         if opt.val_intervals > 0 and epoch % opt.val_intervals == 0:
 
-            # log_dict_test, _ = trainer.train(epoch, test_loader)
-            # for k, v in log_dict_test.items():
-            #     logger.scalar_summary('test_{}'.format(k), v, epoch)
-            #     logger.write('{} {:8f} | '.format(k, v))
+            log_dict_val, _ = trainer.train(epoch, val_loader)
+            for k, v in log_dict_val.items():
+                logger.scalar_summary('test_{}'.format(k), v, epoch)
+                logger.write('{} {:8f} | '.format(k, v))
             save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(mark)),
                        epoch, model, optimizer)
         else:
