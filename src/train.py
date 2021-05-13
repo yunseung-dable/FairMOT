@@ -88,10 +88,10 @@ def main(opt):
 
         if opt.val_intervals > 0 and epoch % opt.val_intervals == 0:
 
-            log_dict_test, _ = trainer.train(epoch, test_loader)
-            for k, v in log_dict_test.items():
-                logger.scalar_summary('test_{}'.format(k), v, epoch)
-                logger.write('{} {:8f} | '.format(k, v))
+            # log_dict_test, _ = trainer.train(epoch, test_loader)
+            # for k, v in log_dict_test.items():
+            #     logger.scalar_summary('test_{}'.format(k), v, epoch)
+            #     logger.write('{} {:8f} | '.format(k, v))
             save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(mark)),
                        epoch, model, optimizer)
         else:
