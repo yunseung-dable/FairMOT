@@ -431,6 +431,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
         #####
         if num_objs > self.max_objs :
             num_objs = self.max_objs
+            print(f'detected objects exceeded {self.max_objs}, PATH : {img_path}')
         ####
         hm = np.zeros((num_classes, output_h, output_w), dtype=np.float32)
         if self.opt.ltrb:
