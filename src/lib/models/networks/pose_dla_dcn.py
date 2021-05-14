@@ -219,7 +219,7 @@ class Tree(nn.Module):
             children.append(x1)
             x = self.tree2(x1, children=children)
         ######
-        del x1
+        # del x1
         return x
 
 
@@ -292,7 +292,7 @@ class DLA(nn.Module):
             x = getattr(self, 'level{}'.format(i))(x)
             y.append(x)
         ######
-        del x
+        # del x
         return y
 
     def load_pretrained_model(self, data='imagenet', name='dla34', hash='ba72cf86'):
@@ -484,7 +484,7 @@ class DLASeg(nn.Module):
         for head in self.heads:
             z[head] = self.__getattr__(head)(y[-1])
         ######
-        del x, y
+        # del x, y
         return [z]
     
 
