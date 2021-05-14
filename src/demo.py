@@ -40,4 +40,5 @@ def demo(opt):
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     opt = opts().init()
+    print(f'using GPU {opt.gpus} ')
     demo(opt)
