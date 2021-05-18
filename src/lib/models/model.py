@@ -46,7 +46,7 @@ def load_model(trainer, model_path, resume=False,
     id_state_dict = checkpoint['id_clf']
     if isinstance(id_state_dict, MotLoss ):
       id_state_dict = id_state_dict.classifier.state_dict()
-    trainer.loss.classifier.load_state_dict(id_state_dict)
+      trainer.loss.classifier.load_state_dict(id_state_dict,  strict=False)
   else : print("coudn't find ID_CLF in checkpoint. ID_CLF will start from scratch" )
 
   # convert data_parallal to model
