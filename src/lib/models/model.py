@@ -44,7 +44,8 @@ def load_model(trainer, model_path, resume=False,
   model = trainer.model
   if 'id_clf' in checkpoint.keys():
     id_state_dict = checkpoint['id_clf']
-    if isinstance(id_state_dict, MotLoss ):
+    print(f'id_state_dict type : {type(id_state_dict)}')
+    if isinstance(id_state_dict, MotLoss):
       id_state_dict = id_state_dict.classifier.state_dict()
       trainer.loss.classifier.load_state_dict(id_state_dict,  strict=False)
     else: print("we found 'id_clf' but coudn't load state dict for some reasons")
@@ -79,7 +80,7 @@ def load_model(trainer, model_path, resume=False,
   model.load_state_dict(state_dict, strict=False)
   # model.load_state_dict(state_dict_, strict=False)
 
-  print('load complete successfully!')
+  print('load process end')
 
   # resume optimizer parameters
   if resume:
