@@ -40,7 +40,7 @@ def load_model(trainer, model_path, resume=False,
   print('trying to load in {}, epoch {}'.format(model_path, checkpoint['epoch']))
   state_dict_ = checkpoint['state_dict']
   state_dict = {}
-
+  print(f'stqte_dict_ type : {type(state_dict_)}')
   model = trainer.model
   if 'id_clf' in checkpoint.keys():
     id_state_dict = checkpoint['id_clf']
