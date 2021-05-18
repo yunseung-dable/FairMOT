@@ -15,7 +15,7 @@ from .networks.pose_hrnet import get_pose_net as get_pose_net_hrnet
 from .networks.pose_dla_conv import get_pose_net as get_dla_conv
 import sys
 sys.path.append('..')
-from ..trains.mot import MotLoss
+from trains.mot import MotLoss
 
 _model_factory = {
   'dlav0': get_dlav0, # default DLAup
