@@ -34,7 +34,7 @@ def create_model(arch, heads, head_conv):
   return model
 
 def load_model(trainer, model_path, resume=False,
-               lr=None, lr_step=None):
+               lr=None, lr_step=None, train=True):
   start_epoch = 0
   checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
   print('trying to load in {}, epoch {}'.format(model_path, checkpoint['epoch']))
@@ -42,16 +42,18 @@ def load_model(trainer, model_path, resume=False,
   state_dict = {}
   # print(f'stqte_dict_ type : {type(state_dict_)}')
   model = trainer.model
-  if 'id_clf' in checkpoint.keys():
-    id_state_dict = checkpoint['id_clf']
-    # print(f'id_state_dict type : {type(id_state_dict)}')
-    if isinstance(id_state_dict, MotLoss):
-      id_state_dict = id_state_dict.classifier.state_dict()
-      trainer.loss.classifier.load_state_dict(id_state_dict,  strict=False)
-    else:
-      trainer.loss.classifier.load_state_dict(id_state_dict, strict=False)
-      print('id classifier load complete')
-  else : print("coudn't find ID_CLF in checkpoint. ID_CLF will start from scratch" )
+
+  if train:
+    if 'id_clf' in checkpoint.keys():
+      id_state_dict = checkpoint['id_clf']
+      # print(f'id_state_dict type : {type(id_state_dict)}')
+      if isinstance(id_state_dict, MotLoss):
+        id_state_dict = id_state_dict.classifier.state_dict()
+        trainer.loss.classifier.load_state_dict(id_state_dict,  strict=False)
+      else:
+        trainer.loss.classifier.load_state_dict(id_state_dict, strict=False)
+        print('id classifier load complete')
+    else : print("coudn't find ID_CLF in checkpoint. ID_CLF will start from scratch" )
 
   # convert data_parallal to model
   for k in state_dict_:
