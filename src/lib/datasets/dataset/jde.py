@@ -12,12 +12,10 @@ import numpy as np
 import torch
 import copy
 
-# from torch.utils.data import Dataset
-# from torchvision.transforms import transforms as T
-# from cython_bbox import bbox_overlaps as bbox_ious
-# from opts import opts
-import sys
-sys.path.append('../../')
+from torch.utils.data import Dataset
+from torchvision.transforms import transforms as T
+from cython_bbox import bbox_overlaps as bbox_ious
+from opts import opts
 from utils.image import gaussian_radius, draw_umich_gaussian, draw_msra_gaussian
 from utils.utils import xyxy2xywh, generate_anchors, xywh2xyxy, encode_delta
 
@@ -211,8 +209,7 @@ class LoadImagesAndLabels:  # for training
             plt.imshow(img[:, :, ::-1])
             plt.plot(labels[:, [1, 3, 3, 1, 1]].T, labels[:, [2, 2, 4, 4, 2]].T, '.-')
             plt.axis('off')
-            plt.savefig('/Users/ximz_mac/dable/data/mot/crowdhuman/test.jpg')
-            print('save succeed')
+            plt.savefig('test.jpg')
             time.sleep(10)
 
         nL = len(labels)
