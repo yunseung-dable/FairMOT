@@ -40,17 +40,15 @@ def load_model(trainer, model_path, resume=False,
   print('trying to load in {}, epoch {}'.format(model_path, checkpoint['epoch']))
   state_dict_ = checkpoint['state_dict']
   state_dict = {}
-  # print(f'stqte_dict_ type : {type(state_dict_)}')
+  print(f'stqte_dict_ type : {type(state_dict_)}')
   model = trainer.model
   if 'id_clf' in checkpoint.keys():
     id_state_dict = checkpoint['id_clf']
-    # print(f'id_state_dict type : {type(id_state_dict)}')
+    print(f'id_state_dict type : {type(id_state_dict)}')
     if isinstance(id_state_dict, MotLoss):
       id_state_dict = id_state_dict.classifier.state_dict()
       trainer.loss.classifier.load_state_dict(id_state_dict,  strict=False)
-    else:
-      trainer.loss.classifier.load_state_dict(id_state_dict, strict=False)
-      print('id classifier load complete')
+    else: print("we found 'id_clf' but coudn't load state dict for some reasons")
   else : print("coudn't find ID_CLF in checkpoint. ID_CLF will start from scratch" )
 
   # convert data_parallal to model
