@@ -71,6 +71,7 @@ def main(opt):
         drop_last=True
     )
 
+    print('Starting training...')
     Trainer = train_factory[opt.task]
     trainer = Trainer(opt, model, optimizer)
     trainer.set_device(opt.gpus, opt.chunk_sizes, opt.device)
@@ -80,8 +81,6 @@ def main(opt):
             trainer, opt.load_model, opt.resume, opt.lr, opt.lr_step)
     elif (opt.load_model !=''):
         trainer = load_model(trainer, opt.load_model, opt.resume, opt.lr, opt.lr_step)
-
-    print('Starting training...')
 
     for epoch in range(start_epoch + 1, opt.num_epochs + 1):
         mark = epoch if opt.save_all else 'last'
