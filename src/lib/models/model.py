@@ -13,8 +13,6 @@ from .networks.resnet_dcn import get_pose_net as get_pose_net_dcn
 from .networks.resnet_fpn_dcn import get_pose_net as get_pose_net_fpn_dcn
 from .networks.pose_hrnet import get_pose_net as get_pose_net_hrnet
 from .networks.pose_dla_conv import get_pose_net as get_dla_conv
-import sys
-sys.path.append('..')
 from ..trains.mot import MotLoss
 
 _model_factory = {
