@@ -41,7 +41,7 @@ def load_model(trainer, model_path, resume=False,
   model = trainer.model
   if 'id_clf' in checkpoint.keys():
     id_state_dict = checkpoint['id_clf']
-    trainer.loss.classifier.load_state_dict(id_state_dict)
+    trainer.loss.load_state_dict(id_state_dict)
   else : print("coudn't find ID_CLF in checkpoint. ID_CLF will start from scratch" )
 
   # convert data_parallal to model
@@ -97,7 +97,7 @@ def load_model(trainer, model_path, resume=False,
 
 def save_model(path, epoch, trainer, optimizer=None):
   model = trainer.model
-  id_clf = trainer.loss.classifier
+  id_clf = trainer.loss
 
   if isinstance(model, torch.nn.DataParallel):
     state_dict = model.module.state_dict()
