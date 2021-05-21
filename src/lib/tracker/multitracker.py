@@ -20,10 +20,6 @@ from .basetrack import BaseTrack, TrackState
 from utils.post_process import ctdet_post_process
 from utils.image import get_affine_transform
 from models.utils import _tranpose_and_gather_feat
-import sys
-sys.path.append('..')
-from trains.train_factory import train_factory
-
 
 
 class STrack(BaseTrack):
@@ -185,11 +181,6 @@ class JDETracker(object):
             opt.device = torch.device('cpu')
         print('Creating model...')
         self.model = create_model(opt.arch, opt.heads, opt.head_conv)
-
-        Trainer = train_factory[opt.task]
-        trainer = Trainer(opt, self.model, optimizer)
-        trainer.set_device(opt.gpus, opt.chunk_sizes, opt.device)
-
         self.model = load_model(self.model, opt.load_model)
         self.model = self.model.to(opt.device)
         self.model.eval()
