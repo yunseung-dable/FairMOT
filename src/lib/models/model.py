@@ -45,7 +45,7 @@ def load_model(trainer, model_path, resume=False,
   if 'id_clf' in checkpoint.keys():
     id_state_dict = checkpoint['id_clf']
     if isinstance(id_state_dict, MotLoss ):
-      id_state_dict = id_state_dict.classifier.state_dict()
+      id_state_dict = id_state_dict.classifier
     trainer.loss.classifier.load_state_dict(id_state_dict)
   else : print("coudn't find ID_CLF in checkpoint. ID_CLF will start from scratch" )
 
@@ -110,7 +110,7 @@ def save_model(path, epoch, trainer, optimizer=None):
     state_dict = model.state_dict()
   data = {'epoch': epoch,
           'state_dict': state_dict,
-          'id_clf' : id_clf.state_dict()}
+          'id_clf' : id_clf}
   if not (optimizer is None):
     data['optimizer'] = optimizer.state_dict()
   torch.save(data, path)
