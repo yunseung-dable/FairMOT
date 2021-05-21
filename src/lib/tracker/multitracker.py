@@ -191,7 +191,7 @@ class JDETracker(object):
         trainer = Trainer(opt, self.model, optimizer)
         trainer.set_device(opt.gpus, opt.chunk_sizes, opt.device)
 
-        self.model = load_model(trainer, opt.load_model)
+        self.model = load_model(self.model, opt.load_model)
         self.model = self.model.to(opt.device)
         self.model.eval()
 
