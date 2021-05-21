@@ -39,10 +39,7 @@ def load_model(trainer, model_path, resume=False,
   state_dict = {}
 
   model = trainer.model
-  if 'id_clf' in checkpoint.keys():
-    id_state_dict = checkpoint['id_clf']
-    trainer.loss.load_state_dict(id_state_dict)
-  else : print("coudn't find ID_CLF in checkpoint. ID_CLF will start from scratch" )
+  id_state_dict = checkpoint['id_clf']
 
   # convert data_parallal to model
   for k in state_dict_:
@@ -72,7 +69,7 @@ def load_model(trainer, model_path, resume=False,
       state_dict[k] = model_state_dict[k]
   model.load_state_dict(state_dict, strict=False)
   # model.load_state_dict(state_dict_, strict=False)
-
+  trainer.loss.load_state_dict(id_state_dict)
   print('load complete successfully!')
 
   # resume optimizer parameters
