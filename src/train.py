@@ -76,11 +76,10 @@ def main(opt):
     trainer = Trainer(opt, model, optimizer)
     trainer.set_device(opt.gpus, opt.chunk_sizes, opt.device)
 
-    if (opt.load_model != '') & (opt.resume):
-        trainer, start_epoch = load_model(
-            trainer, opt.load_model, opt.resume, opt.lr, opt.lr_step)
-    elif (opt.load_model !=''):
-        trainer = load_model(trainer, opt.load_model, opt.resume, opt.lr, opt.lr_step)
+    if opt.load_model != '':
+        model, optimizer, start_epoch = load_model(
+            model, opt.load_model, trainer.optimizer, opt.resume, opt.lr, opt.lr_step)
+
 
     for epoch in range(start_epoch + 1, opt.num_epochs + 1):
         mark = epoch if opt.save_all else 'last'
@@ -92,7 +91,7 @@ def main(opt):
 
         if opt.val_intervals > 0 and epoch % opt.val_intervals == 0:
             save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(mark)),
-                       epoch, trainer, optimizer)
+                       epoch, model, optimizer)
             log_dict_val, _ = trainer.valid(epoch, val_loader)
             for k, v in log_dict_val.items():
                 logger.scalar_summary('test_{}'.format(k), v, epoch)
@@ -100,18 +99,18 @@ def main(opt):
 
         else:
             save_model(os.path.join(opt.save_dir, 'model_last.pth'),
-                       epoch, trainer, optimizer)
+                       epoch, model, optimizer)
         logger.write('\n')
         if epoch in opt.lr_step:
             save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(epoch)),
-                       epoch, trainer, optimizer)
+                       epoch, model, optimizer)
             lr = opt.lr * (0.1 ** (opt.lr_step.index(epoch) + 1))
             print('Drop LR to', lr)
             for param_group in optimizer.param_groups:
                 param_group['lr'] = lr
         if epoch % 5 == 0 or epoch >= 25:
             save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(epoch)),
-                       epoch, trainer, optimizer)
+                       epoch, model, optimizer)
 
         torch.cuda.empty_cache()
         gc.collect()
