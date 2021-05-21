@@ -13,7 +13,6 @@ from .networks.resnet_dcn import get_pose_net as get_pose_net_dcn
 from .networks.resnet_fpn_dcn import get_pose_net as get_pose_net_fpn_dcn
 from .networks.pose_hrnet import get_pose_net as get_pose_net_hrnet
 from .networks.pose_dla_conv import get_pose_net as get_dla_conv
-from ..trains.mot import MotLoss
 
 _model_factory = {
   'dlav0': get_dlav0, # default DLAup
@@ -42,8 +41,6 @@ def load_model(trainer, model_path, resume=False,
   model = trainer.model
   if 'id_clf' in checkpoint.keys():
     id_state_dict = checkpoint['id_clf']
-    if isinstance(id_state_dict, MotLoss ):
-      id_state_dict = id_state_dict.classifier
     trainer.loss.classifier.load_state_dict(id_state_dict)
   else : print("coudn't find ID_CLF in checkpoint. ID_CLF will start from scratch" )
 
