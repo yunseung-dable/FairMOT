@@ -187,8 +187,7 @@ class JDETracker(object):
         self.model = create_model(opt.arch, opt.heads, opt.head_conv)
 
         Trainer = train_factory[opt.task]
-        optimizer = torch.optim.Adam(self.model.parameters(), opt.lr)
-        trainer = Trainer(opt, self.model, optimizer)
+        trainer = Trainer(opt, self.model)
         trainer.set_device(opt.gpus, opt.chunk_sizes, opt.device)
 
         self.model = load_model(self.model, opt.load_model)
