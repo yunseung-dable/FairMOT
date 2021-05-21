@@ -111,10 +111,9 @@ def save_model(path, epoch, trainer, optimizer=None):
     id_clf = id_clf.module.state_dict()
   else:
     state_dict = model.state_dict()
-    id_clf = id_clf.state_dict()
   data = {'epoch': epoch,
           'state_dict': state_dict,
-          'id_clf' : id_clf}
+          'id_clf' : id_clf.state_dict()}
   if not (optimizer is None):
     data['optimizer'] = optimizer.state_dict()
   torch.save(data, path)
