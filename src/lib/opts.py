@@ -221,11 +221,14 @@ class opts(object):
     opt.output_res = max(opt.output_h, opt.output_w)
 
     if opt.task == 'mot':
-      opt.heads = {'hm': opt.num_classes,
-                   'wh': 2 if not opt.ltrb else 4,
+      opt.heads = {'head_hm': opt.num_classes,
+                   'head_wh': 2 if not opt.ltrb else 4,
+                   'full_hm': opt.num_classes,
+                   'full_wh': 2 if not opt.ltrb else 4,
                    'id': opt.reid_dim}
       if opt.reg_offset:
-        opt.heads.update({'reg': 2})
+        opt.heads.update({'head_reg': 2})
+        opt.heads.update({'full_reg': 2})
       opt.nID = dataset.nID
       opt.img_size = (1088, 608)
       #opt.img_size = (864, 480)

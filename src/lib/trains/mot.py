@@ -41,17 +41,22 @@ class MotLoss(torch.nn.Module):
         for s in range(opt.num_stacks):
             output = outputs[s]
             if not opt.mse_loss:
-                output['hm'] = _sigmoid(output['hm'])
+                output['head_hm'] = _sigmoid(output['head_hm'])
+                output['full_hm'] = _sigmoid(output['full_hm'])
 
-            hm_loss += self.crit(output['hm'], batch['hm']) / opt.num_stacks
+            hm_loss += self.crit(output['head_hm'], batch['head_hm']) / opt.num_stacks
+            hm_loss += self.crit(output['full_hm'], batch['full_hm']) / opt.num_stacks
             if opt.wh_weight > 0:
                 wh_loss += self.crit_reg(
                     output['wh'], batch['reg_mask'],
                     batch['ind'], batch['wh']) / opt.num_stacks
-
+##########################
             if opt.reg_offset and opt.off_weight > 0:
                 off_loss += self.crit_reg(output['reg'], batch['reg_mask'],
                                           batch['ind'], batch['reg']) / opt.num_stacks
+                off_loss += self.crit_reg(output['reg'], batch['reg_mask'],
+                                      batch['ind'], batch['reg']) / opt.num_stacks
+
 
             if opt.id_weight > 0:
                 id_head = _tranpose_and_gather_feat(output['id'], batch['ind'])

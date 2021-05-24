@@ -368,7 +368,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 self.img_files[ds] = list(filter(lambda x: len(x) > 0, self.img_files[ds]))
 
             self.label_files[ds] = [
-                x.replace('images', 'labels_with_ids').replace('.png', '.txt').replace('.jpg', '.txt')
+                x.replace('images', 'labels_with_ids_both').replace('.png', '.txt').replace('.jpg', '.txt')
                 for x in self.img_files[ds]]
 
         for ds, label_paths in self.label_files.items():

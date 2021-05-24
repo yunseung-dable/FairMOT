@@ -495,5 +495,8 @@ def get_pose_net(num_layers, heads, head_conv=256, down_ratio=4):
                  final_kernel=1,
                  last_level=5,
                  head_conv=head_conv)
+  print('################################## MODEL ARCH #####################################')
+  print(model)
+  print('##################################### SKIRRR ######################################')
   return model
 
