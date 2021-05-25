@@ -83,14 +83,27 @@ class MotTrainer(BaseTrainer):
         loss = MotLoss(opt)
         return loss_states, loss
 
-    def save_result(self, output, batch, results):
-        reg = output['reg'] if self.opt.reg_offset else None
-        dets = mot_decode(
-            output['hm'], output['wh'], reg=reg,
+    def save_result(self, output, batch, results): ############################ head dets need to be fixed ############################
+        # head_reg = output['head_reg'] if self.opt.reg_offset else None
+        full_reg = output['full_reg'] if self.opt.reg_offset else None
+        # head_dets = mot_decode(
+        #     output['head_hm'], output['head_wh'], reg=head_reg,
+        #     cat_spec_wh=self.opt.cat_spec_wh, K=self.opt.K)
+        full_dets = mot_decode(
+            output['full_hm'], output['full_wh'], reg=full_reg,
             cat_spec_wh=self.opt.cat_spec_wh, K=self.opt.K)
-        dets = dets.cpu().detach().numpy().reshape(1, -1, dets.shape[2])
-        dets_out = ctdet_post_process(
-            dets.copy(), batch['meta']['c'].cpu().numpy(),
+
+        # head_dets = head_dets.cpu().detach().numpy().reshape(1, -1, head_dets.shape[2])
+        full_dets = full_dets.cpu().detach().numpy().reshape(1, -1, full_dets.shape[2])
+
+        # head_dets_out = ctdet_post_process(
+        #     head_dets.copy(), batch['meta']['c'].cpu().numpy(),
+        #     batch['meta']['s'].cpu().detach().numpy(),
+        #     output['head_hm'].shape[2], output['head_hm'].shape[3], output['head_hm'].shape[1])
+        # results[batch['meta']['img_id'].cpu().numpy()[0]] = head_dets_out[0]
+
+        full_dets_out = ctdet_post_process(
+            full_dets.copy(), batch['meta']['c'].cpu().numpy(),
             batch['meta']['s'].cpu().detach().numpy(),
-            output['hm'].shape[2], output['hm'].shape[3], output['hm'].shape[1])
-        results[batch['meta']['img_id'].cpu().numpy()[0]] = dets_out[0]
+            output['full_hm'].shape[2], output['full_hm'].shape[3], output['full_hm'].shape[1])
+        results[batch['meta']['img_id'].cpu().numpy()[0]] = full_dets_out[0]

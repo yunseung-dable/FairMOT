@@ -26,8 +26,6 @@ def main(opt):
 
     print('Setting up data...')
     Dataset = get_dataset(opt.dataset, opt.task)
-    # n_dataset = len(DataParallel)
-    # Dataset_train, Dataset_test = Dataset[: int(n_dataset * 0.8)], Dataset[int(n_dataset * 0.8):]
 
     f = open(opt.data_cfg)
     data_config = json.load(f)
@@ -36,7 +34,7 @@ def main(opt):
     dataset_root = data_config['root']
     f.close()
     transforms = T.Compose([T.ToTensor()])
-    dataset_train = Dataset(opt, dataset_root, trainset_paths, (1088, 608), augment=True, transforms=transforms)
+    dataset_train = Dataset(opt, dataset_root, trainset_paths, (1088, 608), augment=False, transforms=transforms) ############### augment=False ##################
     dataset_val = Dataset(opt, dataset_root, validset_paths, (1088, 608), augment=False, transforms=transforms)
     opt = opts().update_dataset_info_and_set_heads(opt, dataset_train)
     print(opt)
