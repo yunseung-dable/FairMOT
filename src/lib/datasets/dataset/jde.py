@@ -228,7 +228,7 @@ class LoadImagesAndLabels:  # for training
             labels[:, 4] /= width
             labels[:, 5] /= height
 
-            labels[: 6:10] = xyxy2xywh(labels[:, 6:10].copy())
+            labels[:, 6:10] = xyxy2xywh(labels[:, 6:10].copy())
             labels[:, 6] /= width
             labels[:, 7] /= height
             labels[:, 8] /= width
