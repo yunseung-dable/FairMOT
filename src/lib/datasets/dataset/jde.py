@@ -185,7 +185,8 @@ class LoadImagesAndLabels:  # for training
 
         # Load labels
         if os.path.isfile(label_path):
-            labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 6)
+            # labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 6)
+            labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 10)
 
             # Normalized xywh to pixel xyxy format
             labels = labels0.copy()
@@ -193,6 +194,12 @@ class LoadImagesAndLabels:  # for training
             labels[:, 3] = ratio * h * (labels0[:, 3] - labels0[:, 5] / 2) + padh
             labels[:, 4] = ratio * w * (labels0[:, 2] + labels0[:, 4] / 2) + padw
             labels[:, 5] = ratio * h * (labels0[:, 3] + labels0[:, 5] / 2) + padh
+
+            labels[:, 6] = ratio * w * (labels0[:, 6] - labels0[:, 8] / 2) + padw
+            labels[:, 7] = ratio * h * (labels0[:, 7] - labels0[:, 9] / 2) + padh
+            labels[:, 8] = ratio * w * (labels0[:, 6] + labels0[:, 8] / 2) + padw
+            labels[:, 9] = ratio * h * (labels0[:, 7] + labels0[:, 9] / 2) + padh
+
         else:
             labels = np.array([])
 
@@ -220,6 +227,13 @@ class LoadImagesAndLabels:  # for training
             labels[:, 3] /= height
             labels[:, 4] /= width
             labels[:, 5] /= height
+
+            labels[: 6:10] = xyxy2xywh(labels[:, 6:10].copy())
+            labels[:, 6] /= width
+            labels[:, 7] /= height
+            labels[:, 8] /= width
+            labels[:, 9] /= height
+
         if self.augment:
             # random left-right flip
             lr_flip = True
@@ -227,13 +241,14 @@ class LoadImagesAndLabels:  # for training
                 img = np.fliplr(img)
                 if nL > 0:
                     labels[:, 2] = 1 - labels[:, 2]
+                    labels[:, 6] = 1 - labels[:, 6]
 
         img = np.ascontiguousarray(img[:, :, ::-1])  # BGR to RGB
 
         if self.transforms is not None:
             img = self.transforms(img)
 
-        return img, labels, img_path, (h, w)
+        return img, labels, img_path, (h, w) # h,w -> image shape
 
     def __len__(self):
         return self.nF  # number of batches
@@ -249,7 +264,7 @@ def letterbox(img, height=608, width=1088,
     top, bottom = round(dh - 0.1), round(dh + 0.1)
     left, right = round(dw - 0.1), round(dw + 0.1)
     img = cv2.resize(img, new_shape, interpolation=cv2.INTER_AREA)  # resized, no border
-    img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # padded rectangular
+    img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # padded rectangular #(127.5,) means grey color
     return img, ratio, dw, dh
 
 
@@ -381,6 +396,14 @@ class JointDataset(LoadImagesAndLabels):  # for training
                     img_max = lb[1]
                 else:
                     img_max = np.max(lb[:, 1])
+
+                n_obj = len(lb)
+                if n_obj > self.opt.K:
+                    self.label_files[ds].remove(lp)
+                    img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt', '.jpg')
+                    self.img_files[ds].remove(img_path)
+                    print(f"Objects in image {lp} exceeds {opt.K}. excluded {img_path} image & label")
+
                 if img_max > max_index:
                     max_index = img_max
             self.tid_num[ds] = max_index + 1
@@ -408,50 +431,34 @@ class JointDataset(LoadImagesAndLabels):  # for training
         print(self.tid_start_index)
         print('=' * 80)
 
-    def __getitem__(self, files_index):
 
-        for i, c in enumerate(self.cds):
-            if files_index >= c:
-                ds = list(self.label_files.keys())[i]
-                start_index = c
+    def preprocess_before_get(self, ids_arr, bbox_arr, output_h, output_w, num_classes=1):
 
-        img_path = self.img_files[ds][files_index - start_index]
-        label_path = self.label_files[ds][files_index - start_index]
-
-        imgs, labels, img_path, (input_h, input_w) = self.get_data(img_path, label_path)
-        for i, _ in enumerate(labels):
-            if labels[i, 1] > -1:
-                labels[i, 1] += self.tid_start_index[ds]
-
-        output_h = imgs.shape[1] // self.opt.down_ratio
-        output_w = imgs.shape[2] // self.opt.down_ratio
-        num_classes = self.num_classes
-        num_objs = labels.shape[0]
-
-        #####
-        if num_objs > self.max_objs :
-            num_objs = self.max_objs
-            print(f'detected objects exceeded {self.max_objs}, PATH : {img_path}')
-        ####
         hm = np.zeros((num_classes, output_h, output_w), dtype=np.float32)
         if self.opt.ltrb:
             wh = np.zeros((self.max_objs, 4), dtype=np.float32)
         else:
             wh = np.zeros((self.max_objs, 2), dtype=np.float32)
         reg = np.zeros((self.max_objs, 2), dtype=np.float32)
-        ind = np.zeros((self.max_objs, ), dtype=np.int64)
-        reg_mask = np.zeros((self.max_objs, ), dtype=np.uint8)
-        ids = np.zeros((self.max_objs, ), dtype=np.int64)
+        ind = np.zeros((self.max_objs,), dtype=np.int64)
+        reg_mask = np.zeros((self.max_objs,), dtype=np.uint8)
+        ids = np.zeros((self.max_objs,), dtype=np.int64)
+        bbox_xys = np.zeros((self.max_objs, 4), dtype=np.float32)
         bbox_xys = np.zeros((self.max_objs, 4), dtype=np.float32)
 
         draw_gaussian = draw_msra_gaussian if self.opt.mse_loss else draw_umich_gaussian
+
+        num_objs = ids_arr.shape[0]
+
         for k in range(num_objs):
-            label = labels[k]
-            bbox = label[2:]
-            cls_id = int(label[0])
+            # label = labels[k]
+
+            bbox = bbox_arr[k]
+            cls_id = 0
             bbox[[0, 2]] = bbox[[0, 2]] * output_w
             bbox[[1, 3]] = bbox[[1, 3]] * output_h
             bbox_amodal = copy.deepcopy(bbox)
+            # xyxy again?????????????????
             bbox_amodal[0] = bbox_amodal[0] - bbox_amodal[2] / 2.
             bbox_amodal[1] = bbox_amodal[1] - bbox_amodal[3] / 2.
             bbox_amodal[2] = bbox_amodal[0] + bbox_amodal[2]
@@ -477,7 +484,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 ct_int = ct.astype(np.int32)
                 draw_gaussian(hm[cls_id], ct_int, radius)
                 if self.opt.ltrb:
-
+                    # distance from center to lt, from center to rb (w1,h1, w2,h2)
                     wh[k] = ct[0] - bbox_amodal[0], ct[1] - bbox_amodal[1], \
                             bbox_amodal[2] - ct[0], bbox_amodal[3] - ct[1]
                 else:
@@ -485,10 +492,153 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 ind[k] = ct_int[1] * output_w + ct_int[0]
                 reg[k] = ct - ct_int
                 reg_mask[k] = 1
-                ids[k] = label[1]
+                ids[k] = ids_arr[k]
                 bbox_xys[k] = bbox_xy
 
-        ret = {'input': imgs, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'wh': wh, 'reg': reg, 'ids': ids, 'bbox': bbox_xys}
+        return hm, reg_mask, ind, wh, reg, ids, bbox_xys
+
+    def __getitem__(self, files_index):
+
+        for i, c in enumerate(self.cds):
+            if files_index >= c:
+                ds = list(self.label_files.keys())[i]
+                start_index = c
+
+        img_path = self.img_files[ds][files_index - start_index]
+        label_path = self.label_files[ds][files_index - start_index]
+
+        imgs, labels, img_path, (input_h, input_w) = self.get_data(img_path, label_path)
+        for i, _ in enumerate(labels):
+            if labels[i, 1] > -1:
+                labels[i, 1] += self.tid_start_index[ds]
+
+        output_h = imgs.shape[1] // self.opt.down_ratio
+        output_w = imgs.shape[2] // self.opt.down_ratio
+        num_classes = self.num_classes
+        num_objs = labels.shape[0]
+
+        #####
+        # if num_objs > self.max_objs :
+        #     num_objs = self.max_objs
+        #     print(f'detected objects exceeded {self.max_objs}, PATH : {img_path}')
+        ####
+        # hm = np.zeros((num_classes, output_h, output_w), dtype=np.float32)
+        # if self.opt.ltrb:
+        #     wh = np.zeros((self.max_objs, 4), dtype=np.float32)
+        # else:
+        #     wh = np.zeros((self.max_objs, 2), dtype=np.float32)
+        # reg = np.zeros((self.max_objs, 2), dtype=np.float32)
+        # ind = np.zeros((self.max_objs, ), dtype=np.int64)
+        # reg_mask = np.zeros((self.max_objs, ), dtype=np.uint8)
+        # ids = np.zeros((self.max_objs, ), dtype=np.int64)
+        # head_bbox_xys = np.zeros((self.max_objs, 4), dtype=np.float32)
+        # full_bbox_xys = np.zeros((self.max_objs, 4), dtype=np.float32)
+
+        # draw_gaussian = draw_msra_gaussian if self.opt.mse_loss else draw_umich_gaussian
+        # for k in range(num_objs):
+        #     label = labels[k]
+        #
+        #     ################ head box ################
+        #     head_bbox = label[2:6]
+        #     cls_id = int(label[0])
+        #     head_bbox[[0, 2]] = head_bbox[[0, 2]] * output_w
+        #     head_bbox[[1, 3]] = head_bbox[[1, 3]] * output_h
+        #     head_bbox_amodal = copy.deepcopy(head_bbox)
+        #     head_bbox_amodal[0] = head_bbox_amodal[0] - head_bbox_amodal[2] / 2.
+        #     head_bbox_amodal[1] = head_bbox_amodal[1] - head_bbox_amodal[3] / 2.
+        #     head_bbox_amodal[2] = head_bbox_amodal[0] + head_bbox_amodal[2]
+        #     head_bbox_amodal[3] = head_bbox_amodal[1] + head_bbox_amodal[3]
+        #     head_bbox[0] = np.clip(head_bbox[0], 0, output_w - 1)
+        #     head_bbox[1] = np.clip(head_bbox[1], 0, output_h - 1)
+        #     h = head_bbox[3]
+        #     w = head_bbox[2]
+        #
+        #     head_bbox_xy = copy.deepcopy(head_bbox)
+        #     head_bbox_xy[0] = head_bbox_xy[0] - head_bbox_xy[2] / 2
+        #     head_bbox_xy[1] = head_bbox_xy[1] - head_bbox_xy[3] / 2
+        #     head_bbox_xy[2] = head_bbox_xy[0] + head_bbox_xy[2]
+        #     head_bbox_xy[3] = head_bbox_xy[1] + head_bbox_xy[3]
+        #
+        #     if h > 0 and w > 0:
+        #         radius = gaussian_radius((math.ceil(h), math.ceil(w)))
+        #         radius = max(0, int(radius))
+        #         radius = 6 if self.opt.mse_loss else radius
+        #         #radius = max(1, int(radius)) if self.opt.mse_loss else radius
+        #         ct = np.array(
+        #             [head_bbox[0], head_bbox[1]], dtype=np.float32)
+        #         ct_int = ct.astype(np.int32)
+        #         draw_gaussian(hm[cls_id], ct_int, radius)
+        #         if self.opt.ltrb:
+        #
+        #             wh[k] = ct[0] - head_bbox_amodal[0], ct[1] - head_bbox_amodal[1], \
+        #                     head_bbox_amodal[2] - ct[0], head_bbox_amodal[3] - ct[1]
+        #         else:
+        #             wh[k] = 1. * w, 1. * h
+        #         ind[k] = ct_int[1] * output_w + ct_int[0]
+        #         reg[k] = ct - ct_int
+        #         reg_mask[k] = 1
+        #         ids[k] = label[1]
+        #         head_bbox_xys[k] = head_bbox_xy
+        #
+        #     ################ full box ################
+        #     full_bbox = label[6:10]
+        #     full_bbox[[0, 2]] = full_bbox[[0, 2]] * output_w
+        #     full_bbox[[1, 3]] = full_bbox[[1, 3]] * output_h
+        #     full_bbox_amodal = copy.deepcopy(full_bbox)
+        #     full_bbox_amodal[0] = full_bbox_amodal[0] - full_bbox_amodal[2] / 2.
+        #     full_bbox_amodal[1] = full_bbox_amodal[1] - full_bbox_amodal[3] / 2.
+        #     full_bbox_amodal[2] = full_bbox_amodal[0] + full_bbox_amodal[2]
+        #     full_bbox_amodal[3] = full_bbox_amodal[1] + full_bbox_amodal[3]
+        #     full_bbox[0] = np.clip(full_bbox[0], 0, output_w - 1)
+        #     full_bbox[1] = np.clip(full_bbox[1], 0, output_h - 1)
+        #     h = full_bbox[3]
+        #     w = full_bbox[2]
+        #
+        #     full_bbox_xy = copy.deepcopy(full_bbox)
+        #     full_bbox_xy[0] = full_bbox_xy[0] - full_bbox_xy[2] / 2
+        #     full_bbox_xy[1] = full_bbox_xy[1] - full_bbox_xy[3] / 2
+        #     full_bbox_xy[2] = full_bbox_xy[0] + full_bbox_xy[2]
+        #     full_bbox_xy[3] = full_bbox_xy[1] + full_bbox_xy[3]
+        #
+        #     if h > 0 and w > 0:
+        #         radius = gaussian_radius((math.ceil(h), math.ceil(w)))
+        #         radius = max(0, int(radius))
+        #         radius = 6 if self.opt.mse_loss else radius
+        #         # radius = max(1, int(radius)) if self.opt.mse_loss else radius
+        #         ct = np.array(
+        #             [full_bbox[0], full_bbox[1]], dtype=np.float32)
+        #         ct_int = ct.astype(np.int32)
+        #         draw_gaussian(hm[cls_id], ct_int, radius)
+        #         if self.opt.ltrb:
+        #
+        #             wh[k] = ct[0] - full_bbox_amodal[0], ct[1] - full_bbox_amodal[1], \
+        #                     full_bbox_amodal[2] - ct[0], full_bbox_amodal[3] - ct[1]
+        #         else:
+        #             wh[k] = 1. * w, 1. * h
+        #         ind[k] = ct_int[1] * output_w + ct_int[0]
+        #         reg[k] = ct - ct_int
+        #         reg_mask[k] = 1
+        #         ids[k] = label[1]
+        #         full_bbox_xys[k] = full_bbox_xy
+
+        head_hm, head_reg_mask, head_ind, head_wh, head_reg, ids, head_bbox_xys = self.preprocess_before_get(labels[:, 1], labels[:, 2:6], output_h, output_w )
+        full_hm, full_reg_mask, full_ind, full_wh, full_reg,  _ , full_bbox_xys = self.preprocess_before_get(labels[:, 1], labels[:, 6:10], output_h, output_w)
+
+        ret = {'input': imgs,
+               'head_hm': head_hm,
+               'head_reg_mask': head_reg_mask,
+               'head_ind': head_ind,
+               'head_wh': head_wh,
+               'head_reg': head_reg,
+               'ids': ids,
+               'head_bbox': head_bbox_xys,
+               'full_hm' : full_hm,
+               'full_reg_mask' : full_reg_mask,
+               'full_ind' : full_ind,
+               'full_wh' : full_wh,
+               'full_reg' : full_reg,
+               'full_bbox' : full_bbox_xys
+               }
         return ret
 
 

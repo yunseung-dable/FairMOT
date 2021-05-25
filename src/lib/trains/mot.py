@@ -48,23 +48,20 @@ class MotLoss(torch.nn.Module):
             hm_loss += self.crit(output['full_hm'], batch['full_hm']) / opt.num_stacks
             if opt.wh_weight > 0:
                 wh_loss += self.crit_reg(
-                    output['wh'], batch['reg_mask'],
-                    batch['ind'], batch['wh']) / opt.num_stacks
-##########################
+                    output['head_wh'], batch['head_reg_mask'], batch['head_ind'], batch['head_wh']) / opt.num_stacks
+                wh_loss += self.crit_reg(
+                    output['full_wh'], batch['full_reg_mask'],batch['full_ind'], batch['full_wh']) / opt.num_stacks
             if opt.reg_offset and opt.off_weight > 0:
-                off_loss += self.crit_reg(output['reg'], batch['reg_mask'],
-                                          batch['ind'], batch['reg']) / opt.num_stacks
-                off_loss += self.crit_reg(output['reg'], batch['reg_mask'],
-                                      batch['ind'], batch['reg']) / opt.num_stacks
+                off_loss += self.crit_reg(output['head_reg'], batch['head_reg_mask'],batch['head_ind'], batch['head_reg']) / opt.num_stacks
+                off_loss += self.crit_reg(output['full_reg'], batch['full_reg_mask'],batch['full_ind'], batch['full_reg']) / opt.num_stacks
 
+            if opt.id_weight > 0: ####################### exclude head id_loss ######################
+                id_full = _tranpose_and_gather_feat(output['id'], batch['full_ind'])
+                id_full = id_full[batch['full_reg_mask'] > 0].contiguous()
+                id_full = self.emb_scale * F.normalize(id_full)
+                id_target = batch['ids'][batch['full_reg_mask'] > 0]
 
-            if opt.id_weight > 0:
-                id_head = _tranpose_and_gather_feat(output['id'], batch['ind'])
-                id_head = id_head[batch['reg_mask'] > 0].contiguous()
-                id_head = self.emb_scale * F.normalize(id_head)
-                id_target = batch['ids'][batch['reg_mask'] > 0]
-
-                id_output = self.classifier(id_head).contiguous()
+                id_output = self.classifier(id_full).contiguous()
                 id_loss += self.IDLoss(id_output, id_target)
 
         det_loss = opt.hm_weight * hm_loss + opt.wh_weight * wh_loss + opt.off_weight * off_loss
