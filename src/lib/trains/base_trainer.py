@@ -62,7 +62,7 @@ class BaseTrainer(object):
         model_with_loss = self.model_with_loss.module
       model_with_loss.eval()
       torch.cuda.empty_cache()
-      num_iters = 100
+      # num_iters = 100 ### validation is the same with train num_iters
 
     for iter_id, batch in enumerate(data_loader):
 

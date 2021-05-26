@@ -15,6 +15,8 @@ import copy
 from torch.utils.data import Dataset
 from torchvision.transforms import transforms as T
 from cython_bbox import bbox_overlaps as bbox_ious
+import sys
+sys.path.append('../../')
 from opts import opts
 from utils.image import gaussian_radius, draw_umich_gaussian, draw_msra_gaussian
 from utils.utils import xyxy2xywh, generate_anchors, xywh2xyxy, encode_delta
@@ -268,6 +270,50 @@ def letterbox(img, height=608, width=1088,
     return img, ratio, dw, dh
 
 
+def random_affine_label(points, M, a,):
+
+    if len(points) > 0:
+        n = points.shape[0]
+        points = points.copy()
+
+        area0 = (points[:, 2] - points[:, 0]) * (points[:, 3] - points[:, 1])
+
+        # warp points
+        xy = np.ones((n * 4, 3))
+        xy[:, :2] = points[:, [0, 1, 2, 3, 0, 3, 2, 1]].reshape(n * 4, 2)  # x1y1, x2y2, x1y2, x2y1
+        xy = (xy @ M.T)[:, :2].reshape(n, 8)
+
+        # create new boxes
+        x = xy[:, [0, 2, 4, 6]]
+        y = xy[:, [1, 3, 5, 7]]
+        xy = np.concatenate((x.min(1), y.min(1), x.max(1), y.max(1))).reshape(4, n).T
+
+        # apply angle-based reduction
+        radians = a * math.pi / 180
+        reduction = max(abs(math.sin(radians)), abs(math.cos(radians))) ** 0.5
+        x = (xy[:, 2] + xy[:, 0]) / 2
+        y = (xy[:, 3] + xy[:, 1]) / 2
+        w = (xy[:, 2] - xy[:, 0]) * reduction
+        h = (xy[:, 3] - xy[:, 1]) * reduction
+        xy = np.concatenate((x - w / 2, y - h / 2, x + w / 2, y + h / 2)).reshape(4, n).T
+
+        # reject warped points outside of image
+        #np.clip(xy[:, 0], 0, width, out=xy[:, 0])
+        #np.clip(xy[:, 2], 0, width, out=xy[:, 2])
+        #np.clip(xy[:, 1], 0, height, out=xy[:, 1])
+        #np.clip(xy[:, 3], 0, height, out=xy[:, 3])
+        w = xy[:, 2] - xy[:, 0]
+        h = xy[:, 3] - xy[:, 1]
+        area = w * h
+        ar = np.maximum(w / (h + 1e-16), h / (w + 1e-16))
+        i = (w > 4) & (h > 4) & (area / (area0 + 1e-16) > 0.1) & (ar < 10)
+
+        # points = points[i]
+        points = xy
+
+        return points, i
+
+
 def random_affine(img, targets=None, degrees=(-10, 10), translate=(.1, .1), scale=(.9, 1.1), shear=(-2, 2),
                   borderValue=(127.5, 127.5, 127.5)):
     # torchvision.transforms.RandomAffine(degrees=(-10, 10), translate=(.1, .1), scale=(.9, 1.1), shear=(-10, 10))
@@ -300,45 +346,60 @@ def random_affine(img, targets=None, degrees=(-10, 10), translate=(.1, .1), scal
 
     # Return warped points also
     if targets is not None:
-        if len(targets) > 0:
-            n = targets.shape[0]
-            points = targets[:, 2:6].copy()
-            area0 = (points[:, 2] - points[:, 0]) * (points[:, 3] - points[:, 1])
+        head_points, head_i = random_affine_label(targets[:,2:6], M, a)
+        full_points, full_i = random_affine_label(targets[:, 6:10], M, a)
 
-            # warp points
-            xy = np.ones((n * 4, 3))
-            xy[:, :2] = points[:, [0, 1, 2, 3, 0, 3, 2, 1]].reshape(n * 4, 2)  # x1y1, x2y2, x1y2, x2y1
-            xy = (xy @ M.T)[:, :2].reshape(n, 8)
+        total_i = head_i & full_i
 
-            # create new boxes
-            x = xy[:, [0, 2, 4, 6]]
-            y = xy[:, [1, 3, 5, 7]]
-            xy = np.concatenate((x.min(1), y.min(1), x.max(1), y.max(1))).reshape(4, n).T
+        targets = targets[total_i]
 
-            # apply angle-based reduction
-            radians = a * math.pi / 180
-            reduction = max(abs(math.sin(radians)), abs(math.cos(radians))) ** 0.5
-            x = (xy[:, 2] + xy[:, 0]) / 2
-            y = (xy[:, 3] + xy[:, 1]) / 2
-            w = (xy[:, 2] - xy[:, 0]) * reduction
-            h = (xy[:, 3] - xy[:, 1]) * reduction
-            xy = np.concatenate((x - w / 2, y - h / 2, x + w / 2, y + h / 2)).reshape(4, n).T
+        targets[:, 2:6] = head_points[total_i]
+        targets[:, 6:10] = full_points[total_i]
 
-            # reject warped points outside of image
-            #np.clip(xy[:, 0], 0, width, out=xy[:, 0])
-            #np.clip(xy[:, 2], 0, width, out=xy[:, 2])
-            #np.clip(xy[:, 1], 0, height, out=xy[:, 1])
-            #np.clip(xy[:, 3], 0, height, out=xy[:, 3])
-            w = xy[:, 2] - xy[:, 0]
-            h = xy[:, 3] - xy[:, 1]
-            area = w * h
-            ar = np.maximum(w / (h + 1e-16), h / (w + 1e-16))
-            i = (w > 4) & (h > 4) & (area / (area0 + 1e-16) > 0.1) & (ar < 10)
+    #     if len(targets) > 0:
+    #         n = targets.shape[0]
+    #         points = targets[:, 2:6].copy()
+    #         # full_points = targets[:, 6:10].copy()
+    #
+    #         area0 = (points[:, 2] - points[:, 0]) * (points[:, 3] - points[:, 1])
+    #
+    #         # warp points
+    #         xy = np.ones((n * 4, 3))
+    #         xy[:, :2] = points[:, [0, 1, 2, 3, 0, 3, 2, 1]].reshape(n * 4, 2)  # x1y1, x2y2, x1y2, x2y1
+    #         xy = (xy @ M.T)[:, :2].reshape(n, 8)
+    #
+    #         # create new boxes
+    #         x = xy[:, [0, 2, 4, 6]]
+    #         y = xy[:, [1, 3, 5, 7]]
+    #         xy = np.concatenate((x.min(1), y.min(1), x.max(1), y.max(1))).reshape(4, n).T
+    #
+    #         # apply angle-based reduction
+    #         radians = a * math.pi / 180
+    #         reduction = max(abs(math.sin(radians)), abs(math.cos(radians))) ** 0.5
+    #         x = (xy[:, 2] + xy[:, 0]) / 2
+    #         y = (xy[:, 3] + xy[:, 1]) / 2
+    #         w = (xy[:, 2] - xy[:, 0]) * reduction
+    #         h = (xy[:, 3] - xy[:, 1]) * reduction
+    #         xy = np.concatenate((x - w / 2, y - h / 2, x + w / 2, y + h / 2)).reshape(4, n).T
+    #
+    #         # reject warped points outside of image
+    #         #np.clip(xy[:, 0], 0, width, out=xy[:, 0])
+    #         #np.clip(xy[:, 2], 0, width, out=xy[:, 2])
+    #         #np.clip(xy[:, 1], 0, height, out=xy[:, 1])
+    #         #np.clip(xy[:, 3], 0, height, out=xy[:, 3])
+    #         w = xy[:, 2] - xy[:, 0]
+    #         h = xy[:, 3] - xy[:, 1]
+    #         area = w * h
+    #         ar = np.maximum(w / (h + 1e-16), h / (w + 1e-16))
+    #         i = (w > 4) & (h > 4) & (area / (area0 + 1e-16) > 0.1) & (ar < 10)
+    #
+    #         targets = targets[i]
+    #         targets[:, 2:6] = xy[i]
 
-            targets = targets[i]
-            targets[:, 2:6] = xy[i]
+        # return imw, targets, M
 
         return imw, targets, M
+
     else:
         return imw
 
