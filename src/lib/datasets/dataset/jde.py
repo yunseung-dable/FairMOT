@@ -389,6 +389,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
         for ds, label_paths in self.label_files.items():
             max_index = -1
             for lp in label_paths:
+                print(lp)
                 lb = np.loadtxt(lp)
                 if len(lb) < 1:
                     continue
