@@ -12,7 +12,9 @@ def _sigmoid(x):
 def _gather_feat(feat, ind, mask=None):
     dim  = feat.size(2)
     ind  = ind.unsqueeze(2).expand(ind.size(0), ind.size(1), dim)
+    print(f'output[id] : {feat.shape}, ind : {ind.shape}')
     feat = feat.gather(1, ind)
+    print(f'After gather : {feat.shape}')
     if mask is not None:
         mask = mask.unsqueeze(2).expand_as(feat)
         feat = feat[mask]
