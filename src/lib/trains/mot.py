@@ -57,8 +57,8 @@ class MotLoss(torch.nn.Module):
 
             if opt.id_weight > 0: ####################### exclude head id_loss ######################
 
-                print(f"output[id] : {output['id']}")
-                print(f'batch[full_ind] : {batch["full_ind"]}')
+                print(f"output[id] : {output['id'].shape}")
+                print(f'batch[full_ind] : {batch["full_ind"].shape}')
                 id_full = _tranpose_and_gather_feat(output['id'], batch['full_ind'])
                 id_full = id_full[batch['full_reg_mask'] > 0].contiguous()
                 id_full = self.emb_scale * F.normalize(id_full)
