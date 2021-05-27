@@ -32,7 +32,7 @@ def demo(opt):
              use_cuda=opt.gpus!=[-1])
 
     if opt.output_format == 'video':
-        output_video_path = osp.join(result_root, 'MOT16-03-results.mp4')
+        output_video_path = osp.join(result_root, 'demo_results.mp4')
         cmd_str = 'ffmpeg -f image2 -i {}/%05d.jpg -b 5000k -c:v mpeg4 {}'.format(osp.join(result_root, 'frame'), output_video_path)
         os.system(cmd_str)
 

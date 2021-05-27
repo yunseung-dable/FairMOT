@@ -245,19 +245,26 @@ class JDETracker(object):
         ''' Step 1: Network forward, get detections & embeddings'''
         with torch.no_grad():
             output = self.model(im_blob)[-1]
-            hm = output['hm'].sigmoid_()
-            wh = output['wh']
+            head_hm = output['head_hm'].sigmoid_()
+            head_wh = output['head_wh']
+            full_hm = output['full_hm'].sigmoid_()
+            full_wh = output['full_wh']
+            head_reg = output['head_reg'] if self.opt.reg_offset else None
+            full_reg = output['full_reg'] if self.opt.reg_offset else None
+
             id_feature = output['id']
             id_feature = F.normalize(id_feature, dim=1)
 
-            reg = output['reg'] if self.opt.reg_offset else None
-            dets, inds = mot_decode(hm, wh, reg=reg, ltrb=self.opt.ltrb, K=self.opt.K)
-            id_feature = _tranpose_and_gather_feat(id_feature, inds)
+            head_dets, head_inds = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=self.opt.K)
+            full_dets, full_inds = mot_decode(full_hm, full_wh, reg=full_reg, ltrb=self.opt.ltrb, K=self.opt.K)
+            id_feature = _tranpose_and_gather_feat(id_feature, full_inds)
             id_feature = id_feature.squeeze(0)
             id_feature = id_feature.cpu().numpy()
 
-        dets = self.post_process(dets, meta)
-        dets = self.merge_outputs([dets])[1]
+        head_dets = self.post_process(head_dets, meta)
+        full_dets = self.post_process(full_dets, meta)
+        # dets = self.merge_outputs([dets])[1]
+        dets = self.merge_outputs([head_dets, full_dets])[1]
 
         remain_inds = dets[:, 4] > self.opt.conf_thres
         dets = dets[remain_inds]
