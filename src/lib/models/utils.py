@@ -22,8 +22,12 @@ def _gather_feat(feat, ind, mask=None):
     return feat
 
 def _tranpose_and_gather_feat(feat, ind):
+    print(f'transpose first in : {feat.shape}')
     feat = feat.permute(0, 2, 3, 1).contiguous()
+    print(f'transpose after permute : {feat.shape}')
     feat = feat.view(feat.size(0), -1, feat.size(3))
+    print(f'transpose after view : {feat.shape}')
+    print(f'### ind shape : {ind.shape}')
     feat = _gather_feat(feat, ind)
     return feat
 
