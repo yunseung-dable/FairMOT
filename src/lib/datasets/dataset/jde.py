@@ -557,8 +557,8 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 ids[k] = ids_arr[k]
                 bbox_xys[k] = bbox_xy
 
-                print(f'output_w : {output_w}, output_h : {output_h}, ct : {ct}, ct_int : {ct_int}')
-                print(f'Fucking ind : {ind}, ind[k] : {ct_int[1] * output_w + ct_int[0]}')
+                # print(f'output_w : {output_w}, output_h : {output_h}, ct : {ct}, ct_int : {ct_int}')
+                # print(f'ind : {ind}, ind[k] : {ct_int[1] * output_w + ct_int[0]}')
 
         return hm, reg_mask, ind, wh, reg, ids, bbox_xys
 
