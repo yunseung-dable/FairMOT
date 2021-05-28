@@ -156,8 +156,7 @@ class STrack(BaseTrack):
         if self.mean is None:
             return self.full_tlwh.copy()
         ret = self.mean[:4].copy()
-        print(f'ret : {ret}')
-        ret[2] += ret[:2]
+        ret[2:] += ret[:2]
 
         return ret
 
@@ -171,7 +170,7 @@ class STrack(BaseTrack):
             return self.head_tlwh.copy()
         print('Used full mean instead of using head mean!!')
         ret = self.mean[:4].copy()
-        ret[2] += ret[:2]
+        ret[2:] += ret[:2]
 
         return ret
 
