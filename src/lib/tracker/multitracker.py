@@ -294,6 +294,10 @@ class JDETracker(object):
             id_feature = id_feature.squeeze(0)
             id_feature = id_feature.cpu().numpy()
 
+
+        print(f'head_dets shape before post_process : {head_dets.shape}')
+        print(f'full_dets shape before post_process : {full_dets.shape}')
+
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
         # dets = self.merge_outputs([dets])[1]
