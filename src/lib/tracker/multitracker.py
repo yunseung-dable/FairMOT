@@ -248,7 +248,7 @@ class JDETracker(object):
 
     def merge_outputs_both(self, full_dets, head_dets):
 
-        results = np.concatenate([full_dets, head_dets], axis=1).astype(np.float32)
+        results = np.concatenate([full_dets[1], head_dets[1]], axis=2).astype(np.float32)
         scores = results[:, 4]
         if len(scores) > self.max_per_image:
             kth = len(scores) - self.max_per_image
@@ -303,9 +303,11 @@ class JDETracker(object):
         print(f'head_dets contents : {head_dets}')
         print(f'full_dets contents : {full_dets}')
         # dets = self.merge_outputs([dets])[1]
-        print(f'head_dets shape : {head_dets.shape}')
-        print(f'full_dets shape : {full_dets.shape}')
+
         dets = self.merge_outputs_both(full_dets, head_dets)
+
+        print(f'after merge_outputs shape: {dets.shape}')
+        print(f'after merge_outputs contents: {dets}')
 
         # consider only full conf
         remain_inds = dets[:, 4] > self.opt.conf_thres
