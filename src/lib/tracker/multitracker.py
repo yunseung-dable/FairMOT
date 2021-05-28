@@ -320,12 +320,15 @@ class JDETracker(object):
 
         # dets = self.merge_outputs([dets])[1]
         dets = self.merge_outputs_both(full_dets, head_dets)
-        print(f'after merge shape : {dets.shape}')
-        print(f'after merge contents : {dets}')
+
         # consider only full conf
         remain_inds = dets[:, 4] > self.opt.conf_thres
         dets = dets[remain_inds]
         id_feature = id_feature[remain_inds]
+
+        print(f'after thresh dets shape : {dets.shape}')
+        print(f'after thresh id features shape : {id_feature.shape}')
+        print(f'after thresh id features: {id_feature}')
 
         # vis
         '''
