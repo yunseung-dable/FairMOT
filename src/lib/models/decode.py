@@ -53,6 +53,10 @@ def mot_decode(heat, wh, reg=None, ltrb=False, K=100):
     heat = _nms(heat)
 
     scores, inds, clses, ys, xs = _topk(heat, K=K)
+    print(f'scores : {scores}')
+    print(f'inds : {inds}')
+    print(f'ys : {ys}')
+    print(f'xs : {xs}')
     if reg is not None:
         reg = _tranpose_and_gather_feat(reg, inds)
         reg = reg.view(batch, K, 2)
