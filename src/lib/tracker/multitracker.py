@@ -328,7 +328,7 @@ class JDETracker(object):
 
         if len(dets) > 0:
             '''Detections'''
-            detections = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), STrack.tlbr_to_tlwh(tlbrs[5:10]), tlbrs[4], f, 30) for
+            detections = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), STrack.tlbr_to_tlwh(tlbrs[5:9]), tlbrs[4], f, 30) for
                           (tlbrs, f) in zip(dets, id_feature)]
         else:
             detections = []
