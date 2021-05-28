@@ -294,20 +294,11 @@ class JDETracker(object):
             id_feature = id_feature.squeeze(0)
             id_feature = id_feature.cpu().numpy()
 
-        print(f'head_dets shape before post_process : {head_dets.shape}')
-        print(f'full_dets shape before post_process : {full_dets.shape}')
-
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
 
-        print(f'head_dets contents : {head_dets}')
-        print(f'full_dets contents : {full_dets}')
         # dets = self.merge_outputs([dets])[1]
-        print(f'full_dets dict in : {full_dets[1].shape}')
         dets = self.merge_outputs_both(full_dets, head_dets)
-
-        print(f'after merge_outputs shape: {dets.shape}')
-        print(f'after merge_outputs contents: {dets}')
 
         # consider only full conf
         remain_inds = dets[:, 4] > self.opt.conf_thres
