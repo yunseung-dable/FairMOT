@@ -57,10 +57,9 @@ class MotLoss(torch.nn.Module):
 
             if opt.id_weight > 0: ####################### exclude head id_loss ######################
 
-                # print(f"output[id] : {output['id'].shape}")
-                # print(f'batch[full_ind] : {batch["full_ind"].shape}')
+                # id_full(output)=이미지내에 오브젝트별 센터의 인덱스의 dimension만 가져옴 (bs, max_obj, dim)
                 id_full = _tranpose_and_gather_feat(output['id'], batch['full_ind'])
-                id_full = id_full[batch['full_reg_mask'] > 0].contiguous()
+                id_full = id_full[batch['full_reg_mask'] > 0].contiguous() # no obj filtering
                 id_full = self.emb_scale * F.normalize(id_full)
                 id_target = batch['ids'][batch['full_reg_mask'] > 0]
 

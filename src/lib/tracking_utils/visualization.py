@@ -39,17 +39,21 @@ def plot_tracking(image, tlwhs, obj_ids, scores=None, frame_id=0, fps=0., ids2=N
     cv2.putText(im, 'frame: %d fps: %.2f num: %d' % (frame_id, fps, len(tlwhs)),
                 (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, text_scale, (0, 0, 255), thickness=2)
 
-    for i, tlwh in enumerate(tlwhs):
-        x1, y1, w, h = tlwh
-        intbox = tuple(map(int, (x1, y1, x1 + w, y1 + h)))
+    for i, full_tlwh, head_tlwh in enumerate(tlwhs):
+        full_x1, full_y1, full_w, full_h = full_tlwh
+        head_x1, head_y1, head_w, head_h = head_tlwh
+
+        full_intbox = tuple(map(int, (full_x1, full_y1, full_x1 + full_w, full_y1 + full_h)))
+        head_intbox = tuple(map(int, (head_x1, head_y1, head_x1 + head_w, head_y1 + head_h)))
         obj_id = int(obj_ids[i])
         id_text = '{}'.format(int(obj_id))
         if ids2 is not None:
             id_text = id_text + ', {}'.format(int(ids2[i]))
         _line_thickness = 1 if obj_id <= 0 else line_thickness
         color = get_color(abs(obj_id))
-        cv2.rectangle(im, intbox[0:2], intbox[2:4], color=color, thickness=line_thickness)
-        cv2.putText(im, id_text, (intbox[0], intbox[1] + 30), cv2.FONT_HERSHEY_PLAIN, text_scale, (0, 0, 255),
+        cv2.rectangle(im, full_intbox[0:2], full_intbox[2:4], color=color, thickness=line_thickness)
+        cv2.rectangle(im, head_intbox[0:2], head_intbox[2:4], color=color, thickness=line_thickness)
+        cv2.putText(im, id_text, (full_intbox[0], full_intbox[1] + 30), cv2.FONT_HERSHEY_PLAIN, text_scale, (0, 0, 255),
                     thickness=text_thickness)
     return im
 

@@ -24,10 +24,11 @@ from models.utils import _tranpose_and_gather_feat
 
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
-    def __init__(self, tlwh, score, temp_feat, buffer_size=30):
+    def __init__(self, full_tlwh, head_tlwh, score, temp_feat, buffer_size=30):
 
         # wait activate
-        self._tlwh = np.asarray(tlwh, dtype=np.float)
+        self._full_tlwh = np.asarray(full_tlwh, dtype=np.float)
+        self._head_tlwh = np.asarray(head_tlwh, dtype=np.float)
         self.kalman_filter = None
         self.mean, self.covariance = None, None
         self.is_activated = False
@@ -73,7 +74,7 @@ class STrack(BaseTrack):
         """Start a new tracklet"""
         self.kalman_filter = kalman_filter
         self.track_id = self.next_id()
-        self.mean, self.covariance = self.kalman_filter.initiate(self.tlwh_to_xyah(self._tlwh))
+        self.mean, self.covariance = self.kalman_filter.initiate(self.tlwh_to_xyah(self._full_tlwh))
 
         self.tracklet_len = 0
         self.state = TrackState.Tracked
@@ -117,14 +118,28 @@ class STrack(BaseTrack):
         if update_feature:
             self.update_features(new_track.curr_feat)
 
+    # @property
+    # # @jit(nopython=True)
+    # def tlwh(self):
+    #     """Get current position in bounding box format `(top left x, top left y,
+    #             width, height)`.
+    #     """
+    #     if self.mean is None:
+    #         return self._tlwh.copy()
+    #     ret = self.mean[:4].copy()
+    #     ret[2] *= ret[3]
+    #     ret[:2] -= ret[2:] / 2
+    #     return ret
+
+
     @property
     # @jit(nopython=True)
-    def tlwh(self):
-        """Get current position in bounding box format `(top left x, top left y,
-                width, height)`.
+    def full_tlbr(self):
+        """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,
+        `(top left, bottom right)`.
         """
         if self.mean is None:
-            return self._tlwh.copy()
+            return self._full_tlwh.copy()
         ret = self.mean[:4].copy()
         ret[2] *= ret[3]
         ret[:2] -= ret[2:] / 2
@@ -132,12 +147,16 @@ class STrack(BaseTrack):
 
     @property
     # @jit(nopython=True)
-    def tlbr(self):
+    def head_tlbr(self):
         """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,
         `(top left, bottom right)`.
         """
-        ret = self.tlwh.copy()
-        ret[2:] += ret[:2]
+        if self.mean is None:
+            return self._head_tlwh.copy()
+        print('Used full mean instead of using head mean!!')
+        ret = self.mean[:4].copy()
+        ret[2] *= ret[3]
+        ret[:2] -= ret[2:] / 2
         return ret
 
     @staticmethod
@@ -213,7 +232,8 @@ class JDETracker(object):
         results = {}
         for j in range(1, self.opt.num_classes + 1):
             results[j] = np.concatenate(
-                [detection[j] for detection in detections], axis=0).astype(np.float32)
+                # [detection[j] for detection in detections], axis=0).astype(np.float32)
+                [detection[j] for detection in detections], axis=1).astype(np.float32) # full first, head second horizontally
 
         scores = np.hstack(
             [results[j][:, 4] for j in range(1, self.opt.num_classes + 1)])
@@ -224,6 +244,19 @@ class JDETracker(object):
                 keep_inds = (results[j][:, 4] >= thresh)
                 results[j] = results[j][keep_inds]
         return results
+
+
+    def merge_outputs_both(self, full_dets, head_dets):
+
+        results = np.concatenate([full_dets, head_dets], axis=1).astype(np.float32)
+        scores = results[:, 4]
+        if len(scores) > self.max_per_image:
+            kth = len(scores) - self.max_per_image
+            thresh = np.partition(scores, kth)[kth]
+            keep_inds = scores >= thresh
+            results = results[keep_inds]
+        return results
+
 
     def update(self, im_blob, img0):
         self.frame_id += 1
@@ -255,7 +288,7 @@ class JDETracker(object):
             id_feature = output['id']
             id_feature = F.normalize(id_feature, dim=1)
 
-            head_dets, head_inds = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=self.opt.K)
+            head_dets, _ = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=self.opt.K)
             full_dets, full_inds = mot_decode(full_hm, full_wh, reg=full_reg, ltrb=self.opt.ltrb, K=self.opt.K)
             id_feature = _tranpose_and_gather_feat(id_feature, full_inds)
             id_feature = id_feature.squeeze(0)
@@ -264,8 +297,9 @@ class JDETracker(object):
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
         # dets = self.merge_outputs([dets])[1]
-        dets = self.merge_outputs([head_dets, full_dets])[1]
+        dets = self.merge_outputs_both(full_dets, head_dets)
 
+        # consider only full conf
         remain_inds = dets[:, 4] > self.opt.conf_thres
         dets = dets[remain_inds]
         id_feature = id_feature[remain_inds]
@@ -284,8 +318,8 @@ class JDETracker(object):
 
         if len(dets) > 0:
             '''Detections'''
-            detections = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), tlbrs[4], f, 30) for
-                          (tlbrs, f) in zip(dets[:, :5], id_feature)]
+            detections = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), STrack.tlbr_to_tlwh(tlbrs[5:10]), tlbrs[4], f, 30) for
+                          (tlbrs, f) in zip(dets, id_feature)]
         else:
             detections = []
 

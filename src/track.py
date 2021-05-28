@@ -92,11 +92,13 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
         online_ids = []
         #online_scores = []
         for t in online_targets:
-            tlwh = t.tlwh
+            # tlwh = t.tlwh
+            full_tlwh = t.full_tlwh
+            head_tlwh = t.head_tlwh
             tid = t.track_id
-            vertical = tlwh[2] / tlwh[3] > 1.6
-            if tlwh[2] * tlwh[3] > opt.min_box_area and not vertical:
-                online_tlwhs.append(tlwh)
+            vertical = full_tlwh[2] / full_tlwh[3] > 1.6
+            if full_tlwh[2] * full_tlwh[3] > opt.min_box_area and not vertical:
+                online_tlwhs.append([full_tlwh, head_tlwh])
                 online_ids.append(tid)
                 #online_scores.append(t.score)
         timer.toc()
