@@ -86,7 +86,7 @@ class STrack(BaseTrack):
 
     def re_activate(self, new_track, frame_id, new_id=False):
         self.mean, self.covariance = self.kalman_filter.update(
-            self.mean, self.covariance, self.tlwh_to_xyah(new_track.tlwh)
+            self.mean, self.covariance, self.tlwh_to_xyah(new_track.full_tlwh)
         )
 
         self.update_features(new_track.curr_feat)
@@ -118,25 +118,11 @@ class STrack(BaseTrack):
         if update_feature:
             self.update_features(new_track.curr_feat)
 
-    # @property
-    # # @jit(nopython=True)
-    # def tlwh(self):
-    #     """Get current position in bounding box format `(top left x, top left y,
-    #             width, height)`.
-    #     """
-    #     if self.mean is None:
-    #         return self._tlwh.copy()
-    #     ret = self.mean[:4].copy()
-    #     ret[2] *= ret[3]
-    #     ret[:2] -= ret[2:] / 2
-    #     return ret
-
-
     @property
     # @jit(nopython=True)
-    def full_tlbr(self):
-        """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,
-        `(top left, bottom right)`.
+    def full_tlwh(self):
+        """Get current position in bounding box format `(top left x, top left y,
+                width, height)`.
         """
         if self.mean is None:
             return self._full_tlwh.copy()
@@ -147,16 +133,45 @@ class STrack(BaseTrack):
 
     @property
     # @jit(nopython=True)
+    def head_tlwh(self):
+        """Get current position in bounding box format `(top left x, top left y,
+                width, height)`.
+        """
+        if self.mean is None:
+            return self.head_tlwh.copy()
+
+        print('Used full mean instead of using head mean!!')
+        ret = self.mean[:4].copy()
+        ret[2] *= ret[3]
+        ret[:2] -= ret[2:] / 2
+        return ret
+
+
+    @property
+    # @jit(nopython=True)
+    def full_tlbr(self):
+        """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,
+        `(top left, bottom right)`.
+        """
+        if self.mean is None:
+            return self.full_tlwh.copy()
+        ret = self.mean[:4].copy()
+        ret[2] += ret[:2]
+
+        return ret
+
+    @property
+    # @jit(nopython=True)
     def head_tlbr(self):
         """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,
         `(top left, bottom right)`.
         """
         if self.mean is None:
-            return self._head_tlwh.copy()
+            return self.head_tlwh.copy()
         print('Used full mean instead of using head mean!!')
         ret = self.mean[:4].copy()
-        ret[2] *= ret[3]
-        ret[:2] -= ret[2:] / 2
+        ret[2] += ret[:2]
+
         return ret
 
     @staticmethod
