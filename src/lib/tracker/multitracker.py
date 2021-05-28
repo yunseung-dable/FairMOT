@@ -297,6 +297,8 @@ class JDETracker(object):
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
         # dets = self.merge_outputs([dets])[1]
+        print(f'head_dets shape : {head_dets.shape}')
+        print(f'full_dets shape : {full_dets.shape}')
         dets = self.merge_outputs_both(full_dets, head_dets)
 
         # consider only full conf
