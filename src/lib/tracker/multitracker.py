@@ -303,11 +303,17 @@ class JDETracker(object):
             id_feature = output['id']
             id_feature = F.normalize(id_feature, dim=1)
 
+            print(f'hm shape : {head_hm.shape}')
+            print(f'wh shape : {head_wh.shape}')
+            print(f'reg shape : {head_reg.shape}')
+
             head_dets, _ = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=self.opt.K)
             full_dets, full_inds = mot_decode(full_hm, full_wh, reg=full_reg, ltrb=self.opt.ltrb, K=self.opt.K)
             id_feature = _tranpose_and_gather_feat(id_feature, full_inds)
             id_feature = id_feature.squeeze(0)
             id_feature = id_feature.cpu().numpy()
+        # print(f'head_dets shape : {head_dets.shape}')
+
 
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
