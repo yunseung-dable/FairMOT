@@ -303,7 +303,7 @@ class JDETracker(object):
         print(f'head_dets contents : {head_dets}')
         print(f'full_dets contents : {full_dets}')
         # dets = self.merge_outputs([dets])[1]
-
+        print(f'full_dets dict in : {full_dets[1].shape}')
         dets = self.merge_outputs_both(full_dets, head_dets)
 
         print(f'after merge_outputs shape: {dets.shape}')
