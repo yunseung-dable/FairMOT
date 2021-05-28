@@ -296,10 +296,12 @@ class JDETracker(object):
 
         print(f'head_dets shape before post_process : {head_dets.shape}')
         print(f'full_dets shape before post_process : {full_dets.shape}')
-        print(f'head_dets contents : {head_dets}')
-        print(f'full_dets contents : {full_dets}')
+
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
+
+        print(f'head_dets contents : {head_dets}')
+        print(f'full_dets contents : {full_dets}')
         # dets = self.merge_outputs([dets])[1]
         print(f'head_dets shape : {head_dets.shape}')
         print(f'full_dets shape : {full_dets.shape}')
