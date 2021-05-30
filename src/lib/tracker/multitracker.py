@@ -107,9 +107,9 @@ class STrack(BaseTrack):
         """
         self.frame_id = frame_id
         self.tracklet_len += 1
-        ############################# only use full tlwh
         # new_tlwh = new_track.tlwh
         new_tlwh = new_track.full_tlwh
+        self._head_tlwh = new_track.head_tlwh
         self.mean, self.covariance = self.kalman_filter.update(
             self.mean, self.covariance, self.tlwh_to_xyah(new_tlwh))
         self.state = TrackState.Tracked
@@ -348,7 +348,7 @@ class JDETracker(object):
         if len(dets) > 0:
             '''Detections'''
             detections = [STrack(STrack.tlbr_to_tlwh(tlbrs[:4]), STrack.tlbr_to_tlwh(tlbrs[5:9]), tlbrs[4], f, 30) for
-                          (tlbrs, f) in zip(dets, id_feature)]
+                          (tlbrs, f) in zip(dets, id_feature)] ## make STrack by each object
         else:
             detections = []
 
@@ -362,15 +362,15 @@ class JDETracker(object):
                 tracked_stracks.append(track)
 
         ''' Step 2: First association, with embedding'''
-        strack_pool = joint_stracks(tracked_stracks, self.lost_stracks)
+        strack_pool = joint_stracks(tracked_stracks, self.lost_stracks) ## tracked_stracks 추가, self.lost_stracks 추가 한  list가 output
         # Predict the current location with KF
         #for strack in strack_pool:
             #strack.predict()
         STrack.multi_predict(strack_pool)
-        dists = matching.embedding_distance(strack_pool, detections)
+        dists = matching.embedding_distance(strack_pool, detections) # e.g. (0,3)
         #dists = matching.iou_distance(strack_pool, detections)
-        dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections)
-        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.4)
+        dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections) # e.g (0,3)
+        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.4) # e.g. (0,2), (), (0,1,2)
 
         for itracked, idet in matches:
             track = strack_pool[itracked]
