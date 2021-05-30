@@ -39,7 +39,7 @@ def plot_tracking(image, tlwhs, obj_ids, scores=None, frame_id=0, fps=0., ids2=N
     cv2.putText(im, 'frame: %d fps: %.2f num: %d' % (frame_id, fps, len(tlwhs)),
                 (0, int(15 * text_scale)), cv2.FONT_HERSHEY_PLAIN, text_scale, (0, 0, 255), thickness=2)
 
-    for i, full_tlwh, head_tlwh in enumerate(tlwhs):
+    for i, (full_tlwh, head_tlwh) in enumerate(tlwhs):
         full_x1, full_y1, full_w, full_h = full_tlwh
         head_x1, head_y1, head_w, head_h = head_tlwh
 
