@@ -138,14 +138,14 @@ class STrack(BaseTrack):
         """Get current position in bounding box format `(top left x, top left y,
                 width, height)`.
         """
-        if self.mean is None:
-            return self._head_tlwh.copy()
-
-        print('Used full mean instead of using head mean!!')
-        ret = self.mean[:4].copy()
-        ret[2] *= ret[3]
-        ret[:2] -= ret[2:] / 2
-        return ret
+        # if self.mean is None:
+        return self._head_tlwh.copy()
+        #
+        # print('Used full mean instead of using head mean!!')
+        # ret = self.mean[:4].copy()
+        # ret[2] *= ret[3]
+        # ret[:2] -= ret[2:] / 2
+        # return ret
 
 
     @property
@@ -167,13 +167,19 @@ class STrack(BaseTrack):
         """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,
         `(top left, bottom right)`.
         """
-        if self.mean is None:
-            return self.head_tlwh.copy()
-        print('Used full mean instead of using head mean!!')
-        ret = self.mean[:4].copy()
-        ret[2:] += ret[:2]
 
+        ##############
+        ret = self.head_tlwh.copy()
+        ret[2:] += ret[:2]
         return ret
+        ###############
+        # if self.mean is None:
+        #     return self.head_tlwh.copy()
+        # print('Used full mean instead of using head mean!!')
+        # ret = self.mean[:4].copy()
+        # ret[2:] += ret[:2]
+        #
+        # return ret
 
     @staticmethod
     # @jit(nopython=True)
@@ -185,7 +191,7 @@ class STrack(BaseTrack):
         ret[:2] += ret[2:] / 2
         ret[2] /= ret[3]
         return ret
-
+    ##########################
     def to_xyah(self):
         return self.tlwh_to_xyah(self.full_tlwh)
 
