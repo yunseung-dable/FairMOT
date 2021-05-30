@@ -326,10 +326,6 @@ class JDETracker(object):
         dets = dets[remain_inds]
         id_feature = id_feature[remain_inds]
 
-        print(f'after thresh dets shape : {dets.shape}')
-        print(f'after thresh id features shape : {id_feature.shape}')
-        print(f'after thresh id features: {id_feature}')
-
         # vis
         '''
         for i in range(0, dets.shape[0]):
