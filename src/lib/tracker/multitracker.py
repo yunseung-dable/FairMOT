@@ -138,7 +138,7 @@ class STrack(BaseTrack):
                 width, height)`.
         """
         if self.mean is None:
-            return self.head_tlwh.copy()
+            return self._head_tlwh.copy()
 
         print('Used full mean instead of using head mean!!')
         ret = self.mean[:4].copy()
@@ -186,7 +186,7 @@ class STrack(BaseTrack):
         return ret
 
     def to_xyah(self):
-        return self.tlwh_to_xyah(self.tlwh)
+        return self.tlwh_to_xyah(self.full_tlwh)
 
     @staticmethod
     # @jit(nopython=True)
