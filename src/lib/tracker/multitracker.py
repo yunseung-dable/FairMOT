@@ -338,6 +338,9 @@ class JDETracker(object):
         ed_output = metrics.pairwise.euclidean_distances(full_dets[1], head_dets[1])
         print('ed_output')
         print(ed_output)
+
+        dist_argmin = np.argmin(ed_output, axis=1)
+        print(f'dist argmin : {dist_argmin}')
         # iou_res = matching.ious(full_dets[1], head_dets[1])
         # max_value_axis1 = np.max(iou_res, axis=1)
         # over_zero_idx = np.where(max_value_axis1 >0, True, False)
