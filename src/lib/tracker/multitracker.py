@@ -20,7 +20,7 @@ from .basetrack import BaseTrack, TrackState
 from utils.post_process import ctdet_post_process
 from utils.image import get_affine_transform
 from models.utils import _tranpose_and_gather_feat
-import sklearn
+from sklearn import metrics
 
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
@@ -335,7 +335,7 @@ class JDETracker(object):
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
 
-        ed_output = sklearn.metrics.euclidean_distances(full_dets[1], head_dets[1])
+        ed_output = metrics.pairwise.euclidean_distances(full_dets[1], head_dets[1])
         print('ed_output')
         print(ed_output)
         # iou_res = matching.ious(full_dets[1], head_dets[1])
