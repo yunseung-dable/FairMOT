@@ -323,8 +323,8 @@ class JDETracker(object):
             # print(f'reg shape : {head_reg.shape}')
 
             # head_dets, _ = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=self.opt.K)
-            head_dets, _ = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=20)
-            full_dets, full_inds = mot_decode(full_hm, full_wh, reg=full_reg, ltrb=self.opt.ltrb, K=20)
+            head_dets, _ = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=10)
+            full_dets, full_inds = mot_decode(full_hm, full_wh, reg=full_reg, ltrb=self.opt.ltrb, K=10)
             # full_dets, full_inds = mot_decode(full_hm, full_wh, reg=full_reg, ltrb=self.opt.ltrb, K=self.opt.K)
             id_feature = _tranpose_and_gather_feat(id_feature, full_inds)
             id_feature = id_feature.squeeze(0)
