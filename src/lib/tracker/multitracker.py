@@ -348,8 +348,10 @@ class JDETracker(object):
         max_value_axis1 = np.max(iou_res, axis=1)
         over_zero_idx = np.where(max_value_axis1 >0, True, False)
         full_dets_over_zero = full_dets[1][over_zero_idx]
+        print(f'full dets over zero shape {full_dets_over_zero.shape}')
+        print(f'id feature shape before : {id_feature.shape}')
         id_feature = id_feature[over_zero_idx]
-        #
+        print(f'id feature shape after : {id_feature.shape}')
         max_value_axis0 = np.max(iou_res, axis=0)
         over_zero_idx = np.where(max_value_axis0 >0, True, False)
         head_dets_over_zero = head_dets[1][over_zero_idx]
@@ -370,7 +372,7 @@ class JDETracker(object):
         remain_inds = dets[:, 4] > self.opt.conf_thres
         dets = dets[remain_inds]
         id_feature = id_feature[remain_inds]
-        print(f'Remained dets : {len(dets)}')
+        # print(f'Remained dets : {len(dets)}')
         # vis
         '''
         for i in range(0, dets.shape[0]):
