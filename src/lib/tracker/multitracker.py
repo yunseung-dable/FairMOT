@@ -339,10 +339,14 @@ class JDETracker(object):
         print('ed_output')
         print(ed_output)
 
-        dist_argmin = np.argmin(ed_output, axis=0)
+        dist_argmin = np.argmin(ed_output, axis=1)
         print(f'dist argmin : {dist_argmin}')
-        # iou_res = matching.ious(full_dets[1], head_dets[1])
-        # max_value_axis1 = np.max(iou_res, axis=1)
+
+        iou_res = matching.ious(full_dets[1], head_dets[1])
+        print('iou res!!')
+        print(iou_res)
+        max_value_axis1 = np.argmax(iou_res, axis=1)
+        print(f'iou argmax : {max_value_axis1}')
         # over_zero_idx = np.where(max_value_axis1 >0, True, False)
         # full_dets_over_zero = full_dets[1][over_zero_idx]
         # id_feature = id_feature[over_zero_idx]
