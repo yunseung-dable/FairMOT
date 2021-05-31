@@ -338,8 +338,31 @@ class JDETracker(object):
 
 
         iou_res = matching.ious(full_dets[1], head_dets[1])
-        print('iou result!!!!')
-        print(iou_res)
+
+        # print('iou result!!!!')
+        # print(iou_res)
+        # print('lets do max')
+        max_value_axis0 = np.max(iou_res, axis=0)
+        over_zero_idx = np.where(max_value_axis0 >0, True, False)
+        full_dets_over_zero = full_dets[1][over_zero_idx]
+
+        max_value_axis1 = np.max(iou_res, axis=1)
+        over_zero_idx = np.where(max_value_axis1 >0, True, False)
+        head_dets_over_zero = head_dets[1][over_zero_idx]
+
+        iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
+        print('after zero iou filtering')
+        print(iou_res2)
+        argmax = np.argmax(iou_res2, axis=1)
+        print(f'argmax ; {argmax}')
+
+
+
+
+
+        if argmax :
+        head_dets[1][argmax]
+        print()
 
 
 
