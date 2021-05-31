@@ -323,8 +323,8 @@ class JDETracker(object):
             # print(f'reg shape : {head_reg.shape}')
 
             # head_dets, _ = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=self.opt.K)
-            head_dets, _ = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=10)
-            full_dets, full_inds = mot_decode(full_hm, full_wh, reg=full_reg, ltrb=self.opt.ltrb, K = 10)
+            head_dets, _ = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=self.opt.K)
+            full_dets, full_inds = mot_decode(full_hm, full_wh, reg=full_reg, ltrb=self.opt.ltrb, K = self.opt.K)
             # full_dets, full_inds = mot_decode(full_hm, full_wh, reg=full_reg, ltrb=self.opt.ltrb, K=self.opt.K)
             id_feature = _tranpose_and_gather_feat(id_feature, full_inds)
             id_feature = id_feature.squeeze(0)
@@ -348,10 +348,8 @@ class JDETracker(object):
         max_value_axis1 = np.max(iou_res, axis=1)
         over_zero_idx = np.where(max_value_axis1 >0, True, False)
         full_dets_over_zero = full_dets[1][over_zero_idx]
-        print(f'full dets over zero shape {full_dets_over_zero.shape}')
-        print(f'id feature shape before : {id_feature.shape}')
         id_feature = id_feature[over_zero_idx]
-        print(f'id feature shape after : {id_feature.shape}')
+
         max_value_axis0 = np.max(iou_res, axis=0)
         over_zero_idx = np.where(max_value_axis0 >0, True, False)
         head_dets_over_zero = head_dets[1][over_zero_idx]
