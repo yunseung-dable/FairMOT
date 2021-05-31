@@ -358,15 +358,6 @@ class JDETracker(object):
 
 
 
-
-
-        if argmax :
-        head_dets[1][argmax]
-        print()
-
-
-
-
         # dets = self.merge_outputs([dets])[1]
         dets = self.merge_outputs_both(full_dets, head_dets)
 
