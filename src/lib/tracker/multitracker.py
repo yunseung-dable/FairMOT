@@ -268,7 +268,7 @@ class JDETracker(object):
         return results
 
 
-    def iou_btw_head_full(self, full_dets, head_dets): # dets size (batch, 5)
+    # def iou_btw_head_full(self, full_dets, head_dets): # dets size (batch, 5)
 
         # width = full_dets[:, 3] - full_dets[:,0]
 
