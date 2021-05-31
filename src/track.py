@@ -32,10 +32,12 @@ def write_results(filename, results, data_type):
         raise ValueError(data_type)
 
     with open(filename, 'w') as f:
-        for frame_id, (full_tlwhs, head_tlwhs), track_ids in results:
+        for frame_id, tlwhs, track_ids in results:
+            tlwhs = np.asarray(tlwhs)
+            head_tlwhs = tlwhs[:,0]
             if data_type == 'kitti':
                 frame_id -= 1
-            for tlwh, track_id in zip(full_tlwhs, track_ids):
+            for tlwh, track_id in zip(head_tlwhs, track_ids):
                 if track_id < 0:
                     continue
                 x1, y1, w, h = tlwh
