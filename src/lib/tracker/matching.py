@@ -66,7 +66,10 @@ def ious(atlbrs, btlbrs):
         np.ascontiguousarray(atlbrs, dtype=np.float),
         np.ascontiguousarray(btlbrs, dtype=np.float)
     )
-
+    print('######################################')
+    print('This is ious!!!')
+    print(ious)
+    print('######################################')
     return ious
 
 

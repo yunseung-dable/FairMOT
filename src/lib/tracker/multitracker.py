@@ -268,6 +268,14 @@ class JDETracker(object):
         return results
 
 
+    def iou_btw_head_full(self, full_dets, head_dets): # dets size (batch, 5)
+
+        # width = full_dets[:, 3] - full_dets[:,0]
+
+
+
+
+
     def merge_outputs_both(self, full_dets, head_dets):
 
         results = np.concatenate([full_dets[1], head_dets[1]], axis=1).astype(np.float32)
@@ -324,6 +332,11 @@ class JDETracker(object):
 
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
+
+
+
+
+
 
         # dets = self.merge_outputs([dets])[1]
         dets = self.merge_outputs_both(full_dets, head_dets)
