@@ -337,7 +337,7 @@ class JDETracker(object):
 
 
 
-        iou_res = matching.ious(full_dets, head_dets)
+        iou_res = matching.ious(full_dets[1], head_dets[1])
         print('iou result!!!!')
         print(iou_res)
 
