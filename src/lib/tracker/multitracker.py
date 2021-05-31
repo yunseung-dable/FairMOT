@@ -333,7 +333,8 @@ class JDETracker(object):
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
 
-
+        print(f'after post process head_shape : {head_dets.shape}')
+        print(f'after post process full_shape : {full_dets.shape}')
 
 
 
