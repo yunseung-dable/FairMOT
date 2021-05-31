@@ -485,7 +485,7 @@ class JDETracker(object):
         logger.debug('Refind: {}'.format([track.track_id for track in refind_stracks]))
         logger.debug('Lost: {}'.format([track.track_id for track in lost_stracks]))
         logger.debug('Removed: {}'.format([track.track_id for track in removed_stracks]))
-
+        print(f'output_stracks length : {len(output_stracks)}')
         return output_stracks
 
 
