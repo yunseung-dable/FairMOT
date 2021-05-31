@@ -335,31 +335,30 @@ class JDETracker(object):
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
 
-        ed_output = metrics.pairwise.euclidean_distances(full_dets[1], head_dets[1])
-        print('ed_output')
-        print(ed_output)
+        # ed_output = metrics.pairwise.euclidean_distances(full_dets[1], head_dets[1])
+        # print('ed_output')
+        # print(ed_output)
 
-        dist_argmin = np.argmin(ed_output, axis=1)
-        print(f'dist argmin : {dist_argmin}')
+        # dist_argmin = np.argmin(ed_output, axis=1)
+        # print(f'dist argmin : {dist_argmin}')
 
         iou_res = matching.ious(full_dets[1], head_dets[1])
-        print('iou res!!')
-        print(iou_res)
-        max_value_axis1 = np.argmax(iou_res, axis=1)
-        print(f'iou argmax : {max_value_axis1}')
-        # over_zero_idx = np.where(max_value_axis1 >0, True, False)
-        # full_dets_over_zero = full_dets[1][over_zero_idx]
-        # id_feature = id_feature[over_zero_idx]
+        # print('iou res!!')
+        # print(iou_res)
+        max_value_axis1 = np.max(iou_res, axis=1)
+        over_zero_idx = np.where(max_value_axis1 >0, True, False)
+        full_dets_over_zero = full_dets[1][over_zero_idx]
+        id_feature = id_feature[over_zero_idx]
         #
-        # max_value_axis0 = np.max(iou_res, axis=0)
-        # over_zero_idx = np.where(max_value_axis0 >0, True, False)
-        # head_dets_over_zero = head_dets[1][over_zero_idx]
+        max_value_axis0 = np.max(iou_res, axis=0)
+        over_zero_idx = np.where(max_value_axis0 >0, True, False)
+        head_dets_over_zero = head_dets[1][over_zero_idx]
         #
-        # iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
-        # argmax = np.argmax(iou_res2, axis=1)
+        iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
+        argmax = np.argmax(iou_res2, axis=1)
         #
-        # sorted_head_dets = head_dets_over_zero[argmax]
-        # iou_res3 = matching.ious(full_dets_over_zero, sorted_head_dets )
+        sorted_head_dets = head_dets_over_zero[argmax]
+        iou_res3 = matching.ious(full_dets_over_zero, sorted_head_dets )
 
 
 
