@@ -111,7 +111,8 @@ class LoadVideo:  # for inference
 
     def __next__(self):
         self.count += 1
-        if self.count == len(self):
+        # if self.count == len(self):
+        if self.count == 200:
             raise StopIteration
         # Read image
         res, img0 = self.cap.read()  # BGR
