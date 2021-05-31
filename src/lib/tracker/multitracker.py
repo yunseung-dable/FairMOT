@@ -363,7 +363,7 @@ class JDETracker(object):
         print(f'argmax ; {argmax}')
 
         sorted_head_dets = head_dets_over_zero[argmax]
-        iou_res3 = matching.ious(head_dets_over_zero, sorted_head_dets )
+        iou_res3 = matching.ious(full_dets_over_zero, sorted_head_dets )
         print('Last iou res')
         print(iou_res3)
 
