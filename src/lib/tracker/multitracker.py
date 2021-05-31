@@ -370,7 +370,7 @@ class JDETracker(object):
         remain_inds = dets[:, 4] > self.opt.conf_thres
         dets = dets[remain_inds]
         id_feature = id_feature[remain_inds]
-
+        print(f'Remained dets : {len(dets)}')
         # vis
         '''
         for i in range(0, dets.shape[0]):
