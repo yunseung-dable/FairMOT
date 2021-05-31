@@ -20,7 +20,7 @@ from .basetrack import BaseTrack, TrackState
 from utils.post_process import ctdet_post_process
 from utils.image import get_affine_transform
 from models.utils import _tranpose_and_gather_feat
-
+import sklearn
 
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
@@ -323,8 +323,8 @@ class JDETracker(object):
             # print(f'reg shape : {head_reg.shape}')
 
             # head_dets, _ = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=self.opt.K)
-            head_dets, _ = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=self.opt.K)
-            full_dets, full_inds = mot_decode(full_hm, full_wh, reg=full_reg, ltrb=self.opt.ltrb, K = self.opt.K)
+            head_dets, _ = mot_decode(head_hm, head_wh, reg=head_reg, ltrb=self.opt.ltrb, K=10)
+            full_dets, full_inds = mot_decode(full_hm, full_wh, reg=full_reg, ltrb=self.opt.ltrb, K = 10)
             # full_dets, full_inds = mot_decode(full_hm, full_wh, reg=full_reg, ltrb=self.opt.ltrb, K=self.opt.K)
             id_feature = _tranpose_and_gather_feat(id_feature, full_inds)
             id_feature = id_feature.squeeze(0)
@@ -335,37 +335,24 @@ class JDETracker(object):
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
 
-
-
-        iou_res = matching.ious(full_dets[1], head_dets[1])
-
-        # print('iou result!!!!')
-        # print(iou_res)
-        # print('lets do max')
-        max_value_axis1 = np.max(iou_res, axis=1)
-        # print(f'max value : {max_value_axis1}')
-        over_zero_idx = np.where(max_value_axis1 >0, True, False)
-        # print(f'over_zero_idx : {over_zero_idx}')
-        full_dets_over_zero = full_dets[1][over_zero_idx]
-        id_feature = id_feature[over_zero_idx]
-
-        max_value_axis0 = np.max(iou_res, axis=0)
-        # print('lets do max2, vertically')
-        # print(max_value_axis0)
-        over_zero_idx = np.where(max_value_axis0 >0, True, False)
-        # print(f'over zero idx2 : {over_zero_idx}')
-        head_dets_over_zero = head_dets[1][over_zero_idx]
-
-        iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
-        # print('after zero iou filtering')
-        # print(iou_res2)
-        argmax = np.argmax(iou_res2, axis=1)
-        # print(f'argmax ; {argmax}')
-
-        sorted_head_dets = head_dets_over_zero[argmax]
-        iou_res3 = matching.ious(full_dets_over_zero, sorted_head_dets )
-        # print('Last iou res')
-        # print(iou_res3)
+        ed_output = sklearn.metrics.euclidean_distances(full_dets[1], head_dets[1])
+        print('ed_output')
+        print(ed_output)
+        # iou_res = matching.ious(full_dets[1], head_dets[1])
+        # max_value_axis1 = np.max(iou_res, axis=1)
+        # over_zero_idx = np.where(max_value_axis1 >0, True, False)
+        # full_dets_over_zero = full_dets[1][over_zero_idx]
+        # id_feature = id_feature[over_zero_idx]
+        #
+        # max_value_axis0 = np.max(iou_res, axis=0)
+        # over_zero_idx = np.where(max_value_axis0 >0, True, False)
+        # head_dets_over_zero = head_dets[1][over_zero_idx]
+        #
+        # iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
+        # argmax = np.argmax(iou_res2, axis=1)
+        #
+        # sorted_head_dets = head_dets_over_zero[argmax]
+        # iou_res3 = matching.ious(full_dets_over_zero, sorted_head_dets )
 
 
 
