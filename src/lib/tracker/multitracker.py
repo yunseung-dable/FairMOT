@@ -370,7 +370,7 @@ class JDETracker(object):
         remain_inds = dets[:, 4] > self.opt.conf_thres
         dets = dets[remain_inds]
         id_feature = id_feature[remain_inds]
-        # print(f'Remained dets : {len(dets)}')
+        print(f'Remained dets : {len(dets)}')
         # vis
         '''
         for i in range(0, dets.shape[0]):
@@ -441,7 +441,7 @@ class JDETracker(object):
             if not track.state == TrackState.Lost:
                 track.mark_lost()
                 lost_stracks.append(track)
-
+        print(f'Step3 u_detection ids : {u_detection}')
         '''Deal with unconfirmed tracks, usually tracks with only one beginning frame'''
         detections = [detections[i] for i in u_detection]
         dists = matching.iou_distance(unconfirmed, detections)
@@ -455,10 +455,13 @@ class JDETracker(object):
             removed_stracks.append(track)
 
         """ Step 4: Init new stracks"""
+        print(f'Step4 u_detection ids ; {u_detection}')
         for inew in u_detection:
             track = detections[inew]
             if track.score < self.det_thresh:
+                print(f'Step4 thresh filtered ids : {inew}')
                 continue
+            print(f'Step4 newly activated ids : {inew}')
             track.activate(self.kalman_filter, self.frame_id)
             activated_starcks.append(track)
         """ Step 5: Update state"""
