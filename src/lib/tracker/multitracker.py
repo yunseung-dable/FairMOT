@@ -473,22 +473,25 @@ class JDETracker(object):
         # print('Ramained match {} s'.format(t4-t3))
 
         self.tracked_stracks = [t for t in self.tracked_stracks if t.state == TrackState.Tracked]
+        print(f'tracked stracks before JOINT : {len(self.tracked_stracks)}')
         self.tracked_stracks = joint_stracks(self.tracked_stracks, activated_starcks)
         self.tracked_stracks = joint_stracks(self.tracked_stracks, refind_stracks)
+        print(f'tracked stracks after JOINT : {len(self.tracked_stracks)}')
         self.lost_stracks = sub_stracks(self.lost_stracks, self.tracked_stracks)
         self.lost_stracks.extend(lost_stracks)
         self.lost_stracks = sub_stracks(self.lost_stracks, self.removed_stracks)
         self.removed_stracks.extend(removed_stracks)
         self.tracked_stracks, self.lost_stracks = remove_duplicate_stracks(self.tracked_stracks, self.lost_stracks)
+        print(f'tracked stracks after REMOVE DUPLICATE : {len(self.tracked_stracks)}')
         # get scores of lost tracks
         output_stracks = [track for track in self.tracked_stracks if track.is_activated]
-
+        print(f'output_stracks FINAL : {len(output_stracks)}')
         logger.debug('===========Frame {}=========='.format(self.frame_id))
         logger.debug('Activated: {}'.format([track.track_id for track in activated_starcks]))
         logger.debug('Refind: {}'.format([track.track_id for track in refind_stracks]))
         logger.debug('Lost: {}'.format([track.track_id for track in lost_stracks]))
         logger.debug('Removed: {}'.format([track.track_id for track in removed_stracks]))
-        print(f'output_stracks length : {len(output_stracks)}')
+
         return output_stracks
 
 
