@@ -12,6 +12,7 @@ from tracking_utils.utils import mkdir_if_missing
 from tracking_utils.log import logger
 import datasets.dataset.jde as datasets
 from track import eval_seq
+import time
 
 
 logger.setLevel(logging.INFO)
@@ -32,7 +33,13 @@ def demo(opt):
              use_cuda=opt.gpus!=[-1])
 
     if opt.output_format == 'video':
-        output_video_path = osp.join(result_root, 'demo_results.mp4')
+        _, mon, day,hour,min,_,_,_,_ = time.localtime()
+        mon = '0' + str(mon) if mon < 10 else str(mon)
+        day = '0' + str(day) if day < 10 else str(day)
+        hour = '0' + str(hour) if hour < 10 else str(hour)
+        min = '0' + str(min) if min < 10 else str(min)
+
+        output_video_path = osp.join(result_root, mon+day+hour+min)
         cmd_str = 'ffmpeg -f image2 -i {}/%05d.jpg -b 5000k -c:v mpeg4 {}'.format(osp.join(result_root, 'frame'), output_video_path)
         os.system('rm -rf /data/models/mot/test/demo_results.mp4')
         os.system(cmd_str)
