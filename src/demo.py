@@ -34,6 +34,7 @@ def demo(opt):
     if opt.output_format == 'video':
         output_video_path = osp.join(result_root, 'demo_results.mp4')
         cmd_str = 'ffmpeg -f image2 -i {}/%05d.jpg -b 5000k -c:v mpeg4 {}'.format(osp.join(result_root, 'frame'), output_video_path)
+        os.system('rm -rf /data/models/mot/test/demo_results.mp4')
         os.system(cmd_str)
 
 
