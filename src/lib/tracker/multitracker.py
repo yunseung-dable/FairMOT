@@ -331,20 +331,20 @@ class JDETracker(object):
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
 
-        # ed_mat = metrics.pairwise.euclidean_distances(full_dets[1], head_dets[1])
-        # print('ed_output')
-        # print(ed_mat)
+        ed_mat = metrics.pairwise.euclidean_distances(full_dets[1], head_dets[1])
+        print('ed_output')
+        print(ed_mat)
 
         # dist_argmin = np.argmin(ed_output, axis=1)
         # print(f'dist argmin : {dist_argmin}')
 
         iou_mat = matching.ious(full_dets[1], head_dets[1])
-        # print('iou res!!')
-        # print(iou_mat)
+        print('iou res!!')
+        print(iou_mat)
 
-        # ed_iou_mat = ed_mat * iou_mat
-        # print('Ed Iou matrix ')
-        # print(ed_iou_mat)
+        ed_iou_mat = ed_mat * iou_mat
+        print('Ed Iou matrix ')
+        print(ed_iou_mat)
 
         max_value_axis1 = np.max(iou_mat, axis=1)
         over_zero_idx = np.where(max_value_axis1 >0, True, False)
