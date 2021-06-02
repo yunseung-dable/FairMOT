@@ -448,6 +448,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 x.replace('images', 'labels_with_ids_both').replace('.png', '.txt').replace('.jpg', '.txt')
                 for x in self.img_files[ds]]
 
+        freak_labels = []
         for ds, label_paths in self.label_files.items():
             max_index = -1
             for lp in label_paths:
@@ -464,29 +465,29 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 head_coords = lb[:, 6:10]
                 for full_c, head_c in zip(full_coords, head_coords):
                     if (full_c == head_c).all() :
-                        print(lp)
-                        print(self.label_files[ds])
-                        self.label_files[ds].remove(lp)
-                        img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png')
-                        try :
-                            self.img_files[ds].remove(img_path)
-                        except :
-                            img_path = img_path.replace('.png','.jpg')
-                            self.img_files[ds].remove(img_path)
-                        finally:
-                            print(f"Objects in image {lp} have same coords btw HEAD & FULL. Excluded {img_path} image & label")
+                        freak_labels.append(lp)
+                        # self.label_files[ds].remove(lp)
+                        # img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png')
+                        # try :
+                        #     self.img_files[ds].remove(img_path)
+                        # except :
+                        #     img_path = img_path.replace('.png','.jpg')
+                        #     self.img_files[ds].remove(img_path)
+                        # finally:
+                        #     print(f"Objects in image {lp} have same coords btw HEAD & FULL. Excluded {img_path} image & label")
+                    break
 
                 n_obj = len(lb)
                 if n_obj > self.opt.K:
-                    self.label_files[ds].remove(lp)
-                    img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt', '.jpg')
-                    self.img_files[ds].remove(img_path)
-                    print(f"Objects in image {lp} exceeds {opt.K}. excluded {img_path} image & label")
-
+                    # self.label_files[ds].remove(lp)
+                    # img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt', '.jpg')
+                    # self.img_files[ds].remove(img_path)
+                    # print(f"Objects in image {lp} exceeds {opt.K}. excluded {img_path} image & label")
+                    freak_labels.append(lp)
                 if img_max > max_index:
                     max_index = img_max
             self.tid_num[ds] = max_index + 1
-
+        print(freak_labels)
         last_index = 0
         for i, (k, v) in enumerate(self.tid_num.items()):
             self.tid_start_index[k] = last_index
