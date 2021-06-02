@@ -272,10 +272,6 @@ class JDETracker(object):
 
         # width = full_dets[:, 3] - full_dets[:,0]
 
-
-
-
-
     def merge_outputs_both(self, full_dets, head_dets):
 
         results = np.concatenate([full_dets, head_dets], axis=1).astype(np.float32)
@@ -335,22 +331,27 @@ class JDETracker(object):
         head_dets = self.post_process(head_dets, meta)
         full_dets = self.post_process(full_dets, meta)
 
-        # ed_output = metrics.pairwise.euclidean_distances(full_dets[1], head_dets[1])
+        # ed_mat = metrics.pairwise.euclidean_distances(full_dets[1], head_dets[1])
         # print('ed_output')
-        # print(ed_output)
+        # print(ed_mat)
 
         # dist_argmin = np.argmin(ed_output, axis=1)
         # print(f'dist argmin : {dist_argmin}')
 
-        iou_res = matching.ious(full_dets[1], head_dets[1])
+        iou_mat = matching.ious(full_dets[1], head_dets[1])
         # print('iou res!!')
-        # print(iou_res)
-        max_value_axis1 = np.max(iou_res, axis=1)
+        # print(iou_mat)
+
+        # ed_iou_mat = ed_mat * iou_mat
+        # print('Ed Iou matrix ')
+        # print(ed_iou_mat)
+
+        max_value_axis1 = np.max(iou_mat, axis=1)
         over_zero_idx = np.where(max_value_axis1 >0, True, False)
         full_dets_over_zero = full_dets[1][over_zero_idx]
         id_feature = id_feature[over_zero_idx]
 
-        max_value_axis0 = np.max(iou_res, axis=0)
+        max_value_axis0 = np.max(iou_mat, axis=0)
         over_zero_idx = np.where(max_value_axis0 >0, True, False)
         head_dets_over_zero = head_dets[1][over_zero_idx]
         #
@@ -370,7 +371,7 @@ class JDETracker(object):
         remain_inds = dets[:, 4] > self.opt.conf_thres
         dets = dets[remain_inds]
         id_feature = id_feature[remain_inds]
-        print(f'Remained dets : {len(dets)}')
+        # print(f'Remained dets : {len(dets)}')
         # vis
         '''
         for i in range(0, dets.shape[0]):
@@ -441,7 +442,7 @@ class JDETracker(object):
             if not track.state == TrackState.Lost:
                 track.mark_lost()
                 lost_stracks.append(track)
-        print(f'Step3 u_detection ids : {u_detection}')
+        # print(f'Step3 u_detection ids : {u_detection}')
         '''Deal with unconfirmed tracks, usually tracks with only one beginning frame'''
         detections = [detections[i] for i in u_detection]
         dists = matching.iou_distance(unconfirmed, detections)
@@ -455,13 +456,13 @@ class JDETracker(object):
             removed_stracks.append(track)
 
         """ Step 4: Init new stracks"""
-        print(f'Step4 u_detection ids ; {u_detection}')
+        # print(f'Step4 u_detection ids ; {u_detection}')
         for inew in u_detection:
             track = detections[inew]
             if track.score < self.det_thresh:
-                print(f'Step4 thresh filtered ids : {inew}')
+                # print(f'Step4 thresh filtered ids : {inew}')
                 continue
-            print(f'Step4 newly activated ids : {inew}')
+            # print(f'Step4 newly activated ids : {inew}')
             track.activate(self.kalman_filter, self.frame_id)
             activated_starcks.append(track)
         """ Step 5: Update state"""
@@ -473,19 +474,19 @@ class JDETracker(object):
         # print('Ramained match {} s'.format(t4-t3))
 
         self.tracked_stracks = [t for t in self.tracked_stracks if t.state == TrackState.Tracked]
-        print(f'tracked stracks before JOINT : {len(self.tracked_stracks)}')
+        # print(f'tracked stracks before JOINT : {len(self.tracked_stracks)}')
         self.tracked_stracks = joint_stracks(self.tracked_stracks, activated_starcks)
         self.tracked_stracks = joint_stracks(self.tracked_stracks, refind_stracks)
-        print(f'tracked stracks after JOINT : {len(self.tracked_stracks)}')
+        # print(f'tracked stracks after JOINT : {len(self.tracked_stracks)}')
         self.lost_stracks = sub_stracks(self.lost_stracks, self.tracked_stracks)
         self.lost_stracks.extend(lost_stracks)
         self.lost_stracks = sub_stracks(self.lost_stracks, self.removed_stracks)
         self.removed_stracks.extend(removed_stracks)
         self.tracked_stracks, self.lost_stracks = remove_duplicate_stracks(self.tracked_stracks, self.lost_stracks)
-        print(f'tracked stracks after REMOVE DUPLICATE : {len(self.tracked_stracks)}')
+        # print(f'tracked stracks after REMOVE DUPLICATE : {len(self.tracked_stracks)}')
         # get scores of lost tracks
         output_stracks = [track for track in self.tracked_stracks if track.is_activated]
-        print(f'output_stracks FINAL : {len(output_stracks)}')
+        # print(f'output_stracks FINAL : {len(output_stracks)}')
         logger.debug('===========Frame {}=========='.format(self.frame_id))
         logger.debug('Activated: {}'.format([track.track_id for track in activated_starcks]))
         logger.debug('Refind: {}'.format([track.track_id for track in refind_stracks]))
