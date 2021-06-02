@@ -464,6 +464,8 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 head_coords = lb[:, 6:10]
                 for full_c, head_c in zip(full_coords, head_coords):
                     if (full_c == head_c).all() :
+                        print(lp)
+                        print(self.label_files[ds])
                         self.label_files[ds].remove(lp)
                         img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png')
                         try :
