@@ -197,7 +197,7 @@ class LoadImagesAndLabels:  # for training
             labels[:, 3] = ratio * h * (labels0[:, 3] - labels0[:, 5] / 2) + padh
             labels[:, 4] = ratio * w * (labels0[:, 2] + labels0[:, 4] / 2) + padw
             labels[:, 5] = ratio * h * (labels0[:, 3] + labels0[:, 5] / 2) + padh
-
+            # head annotation part
             labels[:, 6] = ratio * w * (labels0[:, 6] - labels0[:, 8] / 2) + padw
             labels[:, 7] = ratio * h * (labels0[:, 7] - labels0[:, 9] / 2) + padh
             labels[:, 8] = ratio * w * (labels0[:, 6] + labels0[:, 8] / 2) + padw
@@ -230,7 +230,7 @@ class LoadImagesAndLabels:  # for training
             labels[:, 3] /= height
             labels[:, 4] /= width
             labels[:, 5] /= height
-
+            # head
             labels[:, 6:10] = xyxy2xywh(labels[:, 6:10].copy())
             labels[:, 6] /= width
             labels[:, 7] /= height
@@ -459,6 +459,15 @@ class JointDataset(LoadImagesAndLabels):  # for training
                     img_max = lb[1]
                 else:
                     img_max = np.max(lb[:, 1])
+
+                full_coords = lb[:, 2:6]
+                head_coords = lb[:, 6:10]
+                for full_c, head_c in zip(full_coords, head_coords):
+                    if full_c == head_c :
+                        self.label_files[ds].remove(lp)
+                        img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt','.jpg')
+                        self.img_files[ds].remove(img_path)
+                        print(f"Objects in image {lp} have same coords btw HEAD and FULL. excluded {img_path} image & label")
 
                 n_obj = len(lb)
                 if n_obj > self.opt.K:
