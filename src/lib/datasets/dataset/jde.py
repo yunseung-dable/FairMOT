@@ -458,6 +458,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
                     continue
                 if len(lb.shape) < 2:
                     img_max = lb[1]
+                    lb = np.expand_dims(lb, axis=0)
                 else:
                     img_max = np.max(lb[:, 1])
 
