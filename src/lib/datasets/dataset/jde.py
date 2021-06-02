@@ -465,10 +465,14 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 for full_c, head_c in zip(full_coords, head_coords):
                     if (full_c == head_c).all() :
                         self.label_files[ds].remove(lp)
-                        img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt','.jpg')
-                        print(f"Objects in image {lp} have same coords btw HEAD and FULL. excluded {img_path} image & label")
-                        self.img_files[ds].remove(img_path)
-
+                        img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png')
+                        try :
+                            self.img_files[ds].remove(img_path)
+                        except :
+                            img_path = img_path.replace('.png','.jpg')
+                            self.img_files[ds].remove(img_path)
+                        finally:
+                            print(f"Objects in image {lp} have same coords btw HEAD & FULL. Excluded {img_path} image & label")
 
                 n_obj = len(lb)
                 if n_obj > self.opt.K:
