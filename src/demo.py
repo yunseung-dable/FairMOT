@@ -40,7 +40,7 @@ def demo(opt):
         min = '0' + str(min) if min < 10 else str(min)
 
         output_video_path = osp.join(result_root, mon+day+hour+min)
-        cmd_str = 'ffmpeg -f image2 -i {}/%05d.jpg -b 5000k -c:v mpeg4 {}'.format(osp.join(result_root, 'frame'), output_video_path)
+        cmd_str = 'ffmpeg -f image2 -i {}/%05d.jpg -b 5000k -c:v mpeg4 {}'.format(osp.join(result_root, 'frame'), 'test_'+output_video_path+'.mp4')
         os.system('rm -rf /data/models/mot/test/demo_results.mp4')
         os.system(cmd_str)
 
