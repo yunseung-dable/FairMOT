@@ -224,13 +224,13 @@ class LoadImagesAndLabels:  # for training
 
         nL = len(labels)
         if nL > 0:
-            # convert xyxy to xywh
+            # convert xyxy to xywh  head anno
             labels[:, 2:6] = xyxy2xywh(labels[:, 2:6].copy())  # / height
             labels[:, 2] /= width
             labels[:, 3] /= height
             labels[:, 4] /= width
             labels[:, 5] /= height
-            # head
+            # full anno
             labels[:, 6:10] = xyxy2xywh(labels[:, 6:10].copy())
             labels[:, 6] /= width
             labels[:, 7] /= height
