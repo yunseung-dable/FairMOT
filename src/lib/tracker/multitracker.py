@@ -331,9 +331,9 @@ class JDETracker(object):
         head_dets = self.post_process(head_dets, meta)[1]
         full_dets = self.post_process(full_dets, meta)[1]
 
-        ed_mat = metrics.pairwise.euclidean_distances(full_dets, head_dets)
-        print(f'elements of full_dets[0] : {full_dets[0]}')
-        print(f'elements of head_dets[0] : {head_dets[0]}')
+        ed_mat = metrics.pairwise.euclidean_distances(full_dets[:, :2], head_dets[:, :2]) # only compute distances btw left top point
+        # print(f'elements of full_dets[0] : {full_dets[0]}')
+        # print(f'elements of head_dets[0] : {head_dets[0]}')
         # print('ed_output')
         # print(ed_mat)
         # print('normalized ed')
