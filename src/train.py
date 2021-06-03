@@ -87,6 +87,8 @@ def main(opt):
             logger.scalar_summary('train_{}'.format(k), v, epoch)
             logger.write('train_{} {:5f} | '.format(k, round(v,3)))
 
+        torch.cuda.empty_cache()
+        gc.collect()
         if opt.val_intervals > 0 and epoch % opt.val_intervals == 0:
             save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(mark)),
                        epoch, model, optimizer)
@@ -110,8 +112,6 @@ def main(opt):
             save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(epoch)),
                        epoch, model, optimizer)
 
-        torch.cuda.empty_cache()
-        gc.collect()
     logger.close()
 
 
