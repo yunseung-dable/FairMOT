@@ -488,6 +488,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 if img_max > max_index:
                     max_index = img_max
             self.tid_num[ds] = max_index + 1
+        print(f'Freaked data : {freak_labels}')
         last_index = 0
         for i, (k, v) in enumerate(self.tid_num.items()):
             self.tid_start_index[k] = last_index
