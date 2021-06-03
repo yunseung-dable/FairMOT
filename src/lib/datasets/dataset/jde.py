@@ -482,8 +482,8 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 if n_obj > self.opt.K:
                     self.label_files[ds].remove(lp)
                     img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt', '.jpg')
-                    self.img_files[ds].remove(img_path)
                     print(f"Objects in image {lp} exceeds {opt.K}. excluded {img_path} image & label")
+                    self.img_files[ds].remove(img_path)
                     freak_labels.append(lp)
                 if img_max > max_index:
                     max_index = img_max
