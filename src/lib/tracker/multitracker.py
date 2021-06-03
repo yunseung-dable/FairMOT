@@ -328,10 +328,12 @@ class JDETracker(object):
         # print(f'head_dets shape : {head_dets.shape}')
 
 
-        head_dets = self.post_process(head_dets, meta)
-        full_dets = self.post_process(full_dets, meta)
+        head_dets = self.post_process(head_dets, meta)[1]
+        full_dets = self.post_process(full_dets, meta)[1]
 
-        ed_mat = metrics.pairwise.euclidean_distances(full_dets[1], head_dets[1])
+        ed_mat = metrics.pairwise.euclidean_distances(full_dets, head_dets)
+        print(f'elements of full_dets[0] : {full_dets[0]}')
+        print(f'elements of head_dets[0] : {head_dets[0]}')
         # print('ed_output')
         # print(ed_mat)
         # print('normalized ed')
@@ -339,7 +341,7 @@ class JDETracker(object):
         # dist_argmin = np.argmin(ed_mat, axis=1)
         # print(f'ed_dist argmin : {dist_argmin}')
 
-        iou_mat = matching.ious(full_dets[1], head_dets[1])
+        iou_mat = matching.ious(full_dets, head_dets)
         # print('iou res!!')
         # print(iou_mat)
 
@@ -349,12 +351,12 @@ class JDETracker(object):
 
         max_value_axis1 = np.max(ed_iou_mat, axis=1)
         over_zero_idx = np.where(max_value_axis1 >0, True, False)
-        full_dets_over_zero = full_dets[1][over_zero_idx]
+        full_dets_over_zero = full_dets[over_zero_idx]
         id_feature = id_feature[over_zero_idx]
 
         max_value_axis0 = np.max(ed_iou_mat, axis=0)
         over_zero_idx = np.where(max_value_axis0 >0, True, False)
-        head_dets_over_zero = head_dets[1][over_zero_idx]
+        head_dets_over_zero = head_dets[over_zero_idx]
         #
         iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
         argmax = np.argmax(iou_res2, axis=1)
