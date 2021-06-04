@@ -338,7 +338,7 @@ class JDETracker(object):
         print(ed_mat)
         # print('normalized ed')
         # ed_minus = 1 - ed_mat / (self.opt.img_size[0] * self.opt.img_size[1])
-        ed_normalize = F.normalize(ed_mat, dim=1)
+        ed_normalize = ed_mat / np.linalg.norm(ed_mat, ord=1)
         print('ed normalized')
         print(ed_normalize)
         ed_minus = 1 - ed_normalize
