@@ -338,7 +338,7 @@ class JDETracker(object):
         print(ed_mat)
         # print('normalized ed')
         # ed_minus = 1 - ed_mat / (self.opt.img_size[0] * self.opt.img_size[1])
-        ed_normalize = ed_mat / np.linalg.norm(ed_mat)
+        ed_normalize = ed_mat / np.linalg.norm(ed_mat, axis=1)
         print('ed normalized')
         print(ed_normalize)
         ed_minus = 1 - ed_normalize
@@ -348,9 +348,11 @@ class JDETracker(object):
         # print(f'ed_dist argmin : {dist_argmin}')
 
         iou_mat = matching.ious(full_dets, head_dets)
-        # print('iou res!!')
-        # print(iou_mat)
-
+        print('iou res!!')
+        print(iou_mat)
+        iou_normalize = F.normalize(iou_mat, dim=1)
+        print('iou normalize')
+        print(iou_normalize)
         ed_iou_mat = ed_minus * iou_mat
         # print('Ed Iou matrix')
         # print(ed_iou_mat)
