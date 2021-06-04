@@ -334,10 +334,16 @@ class JDETracker(object):
         ed_mat = metrics.pairwise.euclidean_distances(full_dets[:, :2], head_dets[:, :2]) # only compute distances btw left top point
         # print(f'elements of full_dets[0] : {full_dets[0]}')
         # print(f'elements of head_dets[0] : {head_dets[0]}')
-        # print('ed_output')
-        # print(ed_mat)
+        print('ed_output')
+        print(ed_mat)
         # print('normalized ed')
-        ed_minus = 1 - ed_mat / (self.opt.img_size[0] * self.opt.img_size[1])
+        # ed_minus = 1 - ed_mat / (self.opt.img_size[0] * self.opt.img_size[1])
+        ed_normalize = F.normalize(ed_mat, dim=1)
+        print('ed normalized')
+        print(ed_normalize)
+        ed_minus = 1 - ed_normalize
+        print('After minus 1')
+        print(ed_minus)
         # dist_argmin = np.argmin(ed_mat, axis=1)
         # print(f'ed_dist argmin : {dist_argmin}')
 
