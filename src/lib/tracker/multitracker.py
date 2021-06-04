@@ -350,7 +350,7 @@ class JDETracker(object):
         iou_mat = matching.ious(full_dets, head_dets)
         print('iou res!!')
         print(iou_mat)
-        iou_normalize = F.normalize(iou_mat, dim=1)
+        iou_normalize = iou_mat / np.linalg.norm(iou_mat, axis=1)
         print('iou normalize')
         print(iou_normalize)
         ed_iou_mat = ed_minus * iou_mat
