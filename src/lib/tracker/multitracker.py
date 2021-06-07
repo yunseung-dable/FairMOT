@@ -154,9 +154,10 @@ class STrack(BaseTrack):
         """Convert bounding box to format `(min x, min y, max x, max y)`, i.e.,
         `(top left, bottom right)`.
         """
-        if self.mean is None:
-            return self.full_tlwh.copy()
-        ret = self.mean[:4].copy()
+        # if self.mean is None:
+        #     return self.full_tlwh.copy()
+        # ret = self.mean[:4].copy()
+        ret = self.full_tlwh.copy()
         ret[2:] += ret[:2]
 
         return ret
