@@ -332,31 +332,24 @@ class JDETracker(object):
         head_dets = self.post_process(head_dets, meta)[1]
         full_dets = self.post_process(full_dets, meta)[1]
 
+        remain_inds = head_dets[:, 4] > self.opt.conf_thres
+        head_dets = head_dets[remain_inds]
+
+        remain_inds = full_dets[:, 4] > self.opt.conf_thres
+        full_dets = full_dets[remain_inds]
+        id_feature = id_feature[remain_inds]
+
         ed_mat = metrics.pairwise.euclidean_distances(full_dets[:, :2], head_dets[:, :2]) # only compute distances btw left top point
-        # print(f'elements of full_dets[0] : {full_dets[0]}')
-        # print(f'elements of head_dets[0] : {head_dets[0]}')
-        # print('ed_output')
-        # print(ed_mat)
-        # print('normalized ed')
-        # ed_minus = 1 - ed_mat / (self.opt.img_size[0] * self.opt.img_size[1])
-        ed_normalize = ed_mat / (np.linalg.norm(ed_mat, axis=1) + 10e-4)
-        # print('ed normalized')
-        # print(ed_normalize)
-        ed_minus = 1 - ed_normalize
-        # print('After minus 1')
-        # print(ed_minus)
+        ed_minus = 1 - ed_mat / (self.opt.img_size[0] * self.opt.img_size[1])
+        # ed_normalize = ed_mat / (np.linalg.norm(ed_mat, axis=1) + 10e-4)
+
+        # ed_minus = 1 - ed_normalize
         # dist_argmin = np.argmin(ed_mat, axis=1)
-        # print(f'ed_dist argmin : {dist_argmin}')
+
 
         iou_mat = matching.ious(full_dets, head_dets)
-        # print('iou res!!')
-        # print(iou_mat)
-        iou_mat = iou_mat / (np.linalg.norm(iou_mat, axis=1) + 10e-4)
-        # print('iou normalize')
-        # print(iou_normalize)
+        # iou_mat = iou_mat / (np.linalg.norm(iou_mat, axis=1) + 10e-4)
         ed_iou_mat = ed_minus * iou_mat
-        # print('Ed Iou matrix')
-        # print(ed_iou_mat)
 
         max_value_axis1 = np.max(ed_iou_mat, axis=1)
         over_zero_idx = np.where(max_value_axis1 >0, True, False)
@@ -374,15 +367,14 @@ class JDETracker(object):
         iou_res3 = matching.ious(full_dets_over_zero, sorted_head_dets )
 
 
-
         # dets = self.merge_outputs([dets])[1]
         # dets = self.merge_outputs_both(full_dets, head_dets)
         dets = self.merge_outputs_both(full_dets_over_zero, sorted_head_dets)
 
         # consider only full conf
-        remain_inds = dets[:, 4] > self.opt.conf_thres
-        dets = dets[remain_inds]
-        id_feature = id_feature[remain_inds]
+        # remain_inds = dets[:, 4] > self.opt.conf_thres
+        # dets = dets[remain_inds]
+        # id_feature = id_feature[remain_inds]
         # print(f'Remained dets : {len(dets)}')
         # vis
         '''
