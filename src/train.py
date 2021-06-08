@@ -92,10 +92,10 @@ def main(opt):
         if opt.val_intervals > 0 and epoch % opt.val_intervals == 0:
             save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(mark)),
                        epoch, model, optimizer)
-            # log_dict_val, _ = trainer.valid(epoch, val_loader)
-            # for k, v in log_dict_val.items():
-            #     logger.scalar_summary('test_{}'.format(k), v, epoch)
-            #     logger.write('val_{} {:5f} | '.format(k, round(v,3)))
+            log_dict_val, _ = trainer.valid(epoch, val_loader)
+            for k, v in log_dict_val.items():
+                logger.scalar_summary('test_{}'.format(k), v, epoch)
+                logger.write('val_{} {:5f} | '.format(k, round(v,3)))
 
         else:
             save_model(os.path.join(opt.save_dir, 'model_last.pth'),
