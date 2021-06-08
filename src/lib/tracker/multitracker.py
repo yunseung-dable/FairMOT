@@ -417,10 +417,10 @@ class JDETracker(object):
         # Predict the current location with KF
         #for strack in strack_pool:
             #strack.predict()
-        STrack.multi_predict(strack_pool)
+        STrack.multi_predict(strack_pool) # kalman filter
         dists = matching.embedding_distance(strack_pool, detections) # e.g. (0,3)
         #dists = matching.iou_distance(strack_pool, detections)
-        dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections) # e.g (0,3)
+        dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections) # e.g (0,3) , lambda * embedding + (1-lambda) * kf.gate distance
         matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.4) # e.g. (0,2), (), (0,1,2)
 
         for itracked, idet in matches:
