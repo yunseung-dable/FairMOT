@@ -346,7 +346,6 @@ class JDETracker(object):
         # ed_minus = 1 - ed_normalize
         # dist_argmin = np.argmin(ed_mat, axis=1)
 
-
         iou_mat = matching.ious(full_dets, head_dets)
         # iou_mat = iou_mat / (np.linalg.norm(iou_mat, axis=1) + 10e-4)
         ed_iou_mat = ed_minus * iou_mat
@@ -360,16 +359,21 @@ class JDETracker(object):
         over_zero_idx = np.where(max_value_axis0 >0, True, False)
         head_dets_over_zero = head_dets[over_zero_idx]
         #
-        iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
-        argmax = np.argmax(iou_res2, axis=1)
-        #
-        sorted_head_dets = head_dets_over_zero[argmax]
-        iou_res3 = matching.ious(full_dets_over_zero, sorted_head_dets )
+
+        if len(full_dets_over_zero) >0 and len(head_dets_over_zero) >0:
+            iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
+            argmax = np.argmax(iou_res2, axis=1)
+            #
+            sorted_head_dets = head_dets_over_zero[argmax]
+            iou_res3 = matching.ious(full_dets_over_zero, sorted_head_dets )
 
 
-        # dets = self.merge_outputs([dets])[1]
-        # dets = self.merge_outputs_both(full_dets, head_dets)
-        dets = self.merge_outputs_both(full_dets_over_zero, sorted_head_dets)
+            # dets = self.merge_outputs([dets])[1]
+            # dets = self.merge_outputs_both(full_dets, head_dets)
+            dets = self.merge_outputs_both(full_dets_over_zero, sorted_head_dets)
+
+        else:
+            dets = []
 
         # consider only full conf
         # remain_inds = dets[:, 4] > self.opt.conf_thres
