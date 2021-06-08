@@ -339,28 +339,30 @@ class JDETracker(object):
         full_dets = full_dets[remain_inds]
         id_feature = id_feature[remain_inds]
 
-        ed_mat = metrics.pairwise.euclidean_distances(full_dets[:, :2], head_dets[:, :2]) # only compute distances btw left top point
-        ed_minus = 1 - ed_mat / (self.opt.img_size[0] * self.opt.img_size[1])
-        # ed_normalize = ed_mat / (np.linalg.norm(ed_mat, axis=1) + 10e-4)
+        if len(head_dets) > 0 and len(full_dets) > 0:
 
-        # ed_minus = 1 - ed_normalize
-        # dist_argmin = np.argmin(ed_mat, axis=1)
+            ed_mat = metrics.pairwise.euclidean_distances(full_dets[:, :2], head_dets[:, :2]) # only compute distances btw left top point
+            ed_minus = 1 - ed_mat / (self.opt.img_size[0] * self.opt.img_size[1])
+            # ed_normalize = ed_mat / (np.linalg.norm(ed_mat, axis=1) + 10e-4)
 
-        iou_mat = matching.ious(full_dets, head_dets)
-        # iou_mat = iou_mat / (np.linalg.norm(iou_mat, axis=1) + 10e-4)
-        ed_iou_mat = ed_minus * iou_mat
+            # ed_minus = 1 - ed_normalize
+            # dist_argmin = np.argmin(ed_mat, axis=1)
 
-        max_value_axis1 = np.max(ed_iou_mat, axis=1)
-        over_zero_idx = np.where(max_value_axis1 >0, True, False)
-        full_dets_over_zero = full_dets[over_zero_idx]
-        id_feature = id_feature[over_zero_idx]
+            iou_mat = matching.ious(full_dets, head_dets)
+            # iou_mat = iou_mat / (np.linalg.norm(iou_mat, axis=1) + 10e-4)
+            ed_iou_mat = ed_minus * iou_mat
 
-        max_value_axis0 = np.max(ed_iou_mat, axis=0)
-        over_zero_idx = np.where(max_value_axis0 >0, True, False)
-        head_dets_over_zero = head_dets[over_zero_idx]
-        #
+            max_value_axis1 = np.max(ed_iou_mat, axis=1)
+            over_zero_idx = np.where(max_value_axis1 >0, True, False)
+            full_dets_over_zero = full_dets[over_zero_idx]
+            id_feature = id_feature[over_zero_idx]
 
-        if len(full_dets_over_zero) >0 and len(head_dets_over_zero) >0:
+            max_value_axis0 = np.max(ed_iou_mat, axis=0)
+            over_zero_idx = np.where(max_value_axis0 >0, True, False)
+            head_dets_over_zero = head_dets[over_zero_idx]
+            #
+
+
             iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
             argmax = np.argmax(iou_res2, axis=1)
             #
@@ -374,7 +376,6 @@ class JDETracker(object):
 
         else:
             dets = []
-
         # consider only full conf
         # remain_inds = dets[:, 4] > self.opt.conf_thres
         # dets = dets[remain_inds]
