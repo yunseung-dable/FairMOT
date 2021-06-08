@@ -361,18 +361,21 @@ class JDETracker(object):
             over_zero_idx = np.where(max_value_axis0 >0, True, False)
             head_dets_over_zero = head_dets[over_zero_idx]
             #
+            if len(head_dets_over_zero) > 0 and len(full_dets_over_zero) > 0:
+
+                iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
+                argmax = np.argmax(iou_res2, axis=1)
+                #
+                sorted_head_dets = head_dets_over_zero[argmax]
+                iou_res3 = matching.ious(full_dets_over_zero, sorted_head_dets )
 
 
-            iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
-            argmax = np.argmax(iou_res2, axis=1)
-            #
-            sorted_head_dets = head_dets_over_zero[argmax]
-            iou_res3 = matching.ious(full_dets_over_zero, sorted_head_dets )
+                # dets = self.merge_outputs([dets])[1]
+                # dets = self.merge_outputs_both(full_dets, head_dets)
+                dets = self.merge_outputs_both(full_dets_over_zero, sorted_head_dets)
 
-
-            # dets = self.merge_outputs([dets])[1]
-            # dets = self.merge_outputs_both(full_dets, head_dets)
-            dets = self.merge_outputs_both(full_dets_over_zero, sorted_head_dets)
+            else:
+                dets = []
 
         else:
             dets = []
