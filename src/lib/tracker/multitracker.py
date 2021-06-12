@@ -342,9 +342,8 @@ class JDETracker(object):
         if len(head_dets) > 0 and len(full_dets) > 0:
 
             ed_mat = metrics.pairwise.euclidean_distances(full_dets[:, :2], head_dets[:, :2]) # only compute distances btw left top point
-            ed_minus = 1 - ed_mat / (self.opt.img_size[0] * self.opt.img_size[1])
+            ed_minus = 1 - ed_mat / (width**2 * height**2)
             # ed_normalize = ed_mat / (np.linalg.norm(ed_mat, axis=1) + 10e-4)
-
             # ed_minus = 1 - ed_normalize
             # dist_argmin = np.argmin(ed_mat, axis=1)
 
