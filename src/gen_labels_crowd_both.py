@@ -45,7 +45,7 @@ def gen_labels_crowd(data_root, label_root, ann_root):
             full_x += full_w / 2
             full_y += full_h / 2
 
-            label_fpath = img_path.replace('images', 'labels_with_ids_both').replace('.png', '.txt').replace('.jpg', '.txt')
+            label_fpath = img_path.replace('images', 'labels_with_ids_both_vh').replace('.png', '.txt').replace('.jpg', '.txt')
             label_str = '0 {:d} {:.6f} {:.6f} {:.6f} {:.6f} {:.6f} {:.6f} {:.6f} {:.6f}\n'.format(
                 tid_curr, head_x / img_width, head_y / img_height, head_w / img_width, head_h / img_height,
                 full_x / img_width, full_y / img_height, full_w / img_width, full_h / img_height)
