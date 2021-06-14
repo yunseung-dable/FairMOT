@@ -347,35 +347,40 @@ class JDETracker(object):
         id_feature = id_feature[remain_inds]
 
         if len(head_dets) > 0 and len(full_dets) > 0:
-            full_xyt = self.get_xyt(full_dets)
-            head_xyt = self.get_xyt(head_dets)
-            ed_mat = metrics.pairwise.euclidean_distances(full_xyt, head_xyt) # only compute distances btw left top point
-            ed_minus = 1 - ed_mat / np.sqrt(width**2 + height**2)
+
             # ed_normalize = ed_mat / (np.linalg.norm(ed_mat, axis=1) + 10e-4)
             # ed_minus = 1 - ed_normalize
             # dist_argmin = np.argmin(ed_mat, axis=1)
 
             iou_mat = matching.ious(full_dets, head_dets)
             # iou_mat = iou_mat / (np.linalg.norm(iou_mat, axis=1) + 10e-4)
-            ed_iou_mat = ed_minus * iou_mat
+            # ed_iou_mat = ed_minus * iou_mat
 
-            max_value_axis1 = np.max(ed_iou_mat, axis=1)
+            # max_value_axis1 = np.max(ed_iou_mat, axis=1)
+            max_value_axis1 = np.max(iou_mat, axis=1)
             over_zero_idx = np.where(max_value_axis1 >0, True, False)
             full_dets_over_zero = full_dets[over_zero_idx]
             id_feature = id_feature[over_zero_idx]
 
-            max_value_axis0 = np.max(ed_iou_mat, axis=0)
+            # max_value_axis0 = np.max(ed_iou_mat, axis=0)
+            max_value_axis0 = np.max(iou_mat, axis=0)
             over_zero_idx = np.where(max_value_axis0 >0, True, False)
             head_dets_over_zero = head_dets[over_zero_idx]
             #
             if len(head_dets_over_zero) > 0 and len(full_dets_over_zero) > 0:
 
+                full_xyt = self.get_xyt(full_dets_over_zero)
+                head_xyt = self.get_xyt(head_dets_over_zero)
+                ed_mat = metrics.pairwise.euclidean_distances(full_xyt,
+                                                              head_xyt)  # only compute distances btw left top point
+                ed_minus = 1 - ed_mat / np.sqrt(width ** 2 + height ** 2)
+
                 iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
-                argmax = np.argmax(iou_res2, axis=1)
+                iou_filtered = np.where(iou_res2 > 0, 1, 0)
+                ed_iou_mat = ed_minus * iou_filtered
+                argmax = np.argmax(ed_iou_mat, axis=1)
                 #
                 sorted_head_dets = head_dets_over_zero[argmax]
-                iou_res3 = matching.ious(full_dets_over_zero, sorted_head_dets )
-
 
                 # dets = self.merge_outputs([dets])[1]
                 # dets = self.merge_outputs_both(full_dets, head_dets)
