@@ -41,7 +41,8 @@ def gen_labels_crowd(data_root, label_root, ann_root):
             head_x += head_w / 2
             head_y += head_h / 2
 
-            full_x, full_y, full_w, full_h = anns[i]['fbox']
+            # full_x, full_y, full_w, full_h = anns[i]['fbox']
+            full_x, full_y, full_w, full_h = anns[i]['vbox']
             full_x += full_w / 2
             full_y += full_h / 2
 
