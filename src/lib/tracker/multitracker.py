@@ -350,7 +350,7 @@ class JDETracker(object):
             full_xyt = self.get_xyt(full_dets)
             head_xyt = self.get_xyt(head_dets)
             ed_mat = metrics.pairwise.euclidean_distances(full_xyt, head_xyt) # only compute distances btw left top point
-            ed_minus = 1 - ed_mat / (width**2 * height**2)
+            ed_minus = 1 - ed_mat / np.sqrt(width**2 + height**2)
             # ed_normalize = ed_mat / (np.linalg.norm(ed_mat, axis=1) + 10e-4)
             # ed_minus = 1 - ed_normalize
             # dist_argmin = np.argmin(ed_mat, axis=1)
