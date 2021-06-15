@@ -478,7 +478,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 if n_obj > self.opt.K:
                     self.label_files[ds].remove(lp)
                     # img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt', '.jpg')
-                    img_path = lp.replace('labels_with_ids_both_vn', 'images').replace('.txt', '.png')
+                    img_path = lp.replace('labels_with_ids_both_vh', 'images').replace('.txt', '.png')
                     try :
                         self.img_files[ds].remove(img_path)
                     except  :
