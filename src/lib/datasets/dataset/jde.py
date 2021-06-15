@@ -484,7 +484,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
                     except  :
                         img_path = img_path.replace('.png', '.jpg')
                         self.img_files[ds].remove(img_path)
-                    print(f"Objects in image {lp} exceeds {opt.K}. excluded {img_path} image & label")
+                    # print(f"Objects in image {lp} exceeds {opt.K}. excluded {img_path} image & label")
                     freak_labels.append(lp)
 
                 if len(lb.shape) < 2:
@@ -497,7 +497,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
                     max_index = img_max
 
             self.tid_num[ds] = max_index + 1
-        print(f'Freaked data : {freak_labels}')
+        print(f'The number of Freaked data : {len(freak_labels)}')
         last_index = 0
         for i, (k, v) in enumerate(self.tid_num.items()):
             self.tid_start_index[k] = last_index
