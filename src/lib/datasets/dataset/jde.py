@@ -446,7 +446,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
 
             self.label_files[ds] = [
                 # x.replace('images', 'labels_with_ids_both').replace('.png', '.txt').replace('.jpg', '.txt')
-                x.replace('images', 'labels_with_ids_both_vn').replace('.png', '.txt').replace('.jpg', '.txt')
+                x.replace('images', 'labels_with_ids_both_vh').replace('.png', '.txt').replace('.jpg', '.txt')
                 for x in self.img_files[ds]]
 
         freak_labels = []

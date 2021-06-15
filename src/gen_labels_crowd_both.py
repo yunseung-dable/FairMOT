@@ -25,7 +25,8 @@ def gen_labels_crowd(data_root, label_root, ann_root):
 
     tid_curr = 0
     for i, ann_data in enumerate(anns_data):
-        print(i)
+        if i % 1000 ==0:
+            print(f'{i}th processed')
         image_name = '{}.jpg'.format(ann_data['ID'])
         img_path = os.path.join(data_root, image_name)
         anns = ann_data['gtboxes']
