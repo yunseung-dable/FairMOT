@@ -190,7 +190,7 @@ class LoadImagesAndLabels:  # for training
         if os.path.isfile(label_path):
             # labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 6)
             labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 10)
-
+            print(f'In __getdata__, The number of labels is : {len(labels0)}, Path : {label_path},')
             # Normalized xywh to pixel xyxy format
             labels = labels0.copy()
             labels[:, 2] = ratio * w * (labels0[:, 2] - labels0[:, 4] / 2) + padw
@@ -541,7 +541,6 @@ class JointDataset(LoadImagesAndLabels):  # for training
         print(f'ids_arr : {ids_arr.shape[0]}, bbox_arr shape : {bbox_arr.shape}')
         for k in range(num_objs):
             # label = labels[k]
-            print(f'This is k : {k}')
             bbox = bbox_arr[k]
             cls_id = 0
             bbox[[0, 2]] = bbox[[0, 2]] * output_w
@@ -572,8 +571,6 @@ class JointDataset(LoadImagesAndLabels):  # for training
                     [bbox[0], bbox[1]], dtype=np.float32)
                 ct_int = ct.astype(np.int32)
                 draw_gaussian(hm[cls_id], ct_int, radius)
-                print(f'once again k is {k}')
-                wh[k]
                 if self.opt.ltrb:
                     # distance from center to lt, from center to rb (w1,h1, w2,h2)
                     wh[k] = ct[0] - bbox_amodal[0], ct[1] - bbox_amodal[1], \
