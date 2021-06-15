@@ -539,7 +539,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
         draw_gaussian = draw_msra_gaussian if self.opt.mse_loss else draw_umich_gaussian
 
         num_objs = ids_arr.shape[0]
-
+        print(f'ids_arr : {ids_arr}, bbox_arr shape : {bbox_arr.shape}')
         for k in range(num_objs):
             # label = labels[k]
 
@@ -714,8 +714,8 @@ class JointDataset(LoadImagesAndLabels):  # for training
         #         ids[k] = label[1]
         #         full_bbox_xys[k] = full_bbox_xy
 
-        head_hm, head_reg_mask, head_ind, head_wh, head_reg, ids, head_bbox_xys = self.preprocess_before_get(labels[:, 1], labels[:, 2:6], output_h, output_w )
-        full_hm, full_reg_mask, full_ind, full_wh, full_reg,  _ , full_bbox_xys = self.preprocess_before_get(labels[:, 1], labels[:, 6:10], output_h, output_w)
+        head_hm, head_reg_mask, head_ind, head_wh, head_reg, _, head_bbox_xys = self.preprocess_before_get(labels[:, 1], labels[:, 2:6], output_h, output_w )
+        full_hm, full_reg_mask, full_ind, full_wh, full_reg,  ids, full_bbox_xys = self.preprocess_before_get(labels[:, 1], labels[:, 6:10], output_h, output_w)
 
         ret = {'input': imgs,
                'head_hm': head_hm,
