@@ -453,7 +453,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
         for ds, label_paths in self.label_files.items():
             max_index = -1
             for lp in label_paths:
-                # print(lp)
+                print(lp)
                 if lp == '/data/mot/crowdhuman/labels_with_ids_both_vh/train/283647,18df9000aa5f67ce.txt':
                     print('freaks here')
                     lb = np.loadtxt(lp)
