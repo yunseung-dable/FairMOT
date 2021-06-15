@@ -445,7 +445,8 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 self.img_files[ds] = list(filter(lambda x: len(x) > 0, self.img_files[ds]))
 
             self.label_files[ds] = [
-                x.replace('images', 'labels_with_ids_both').replace('.png', '.txt').replace('.jpg', '.txt')
+                # x.replace('images', 'labels_with_ids_both').replace('.png', '.txt').replace('.jpg', '.txt')
+                x.replace('images', 'labels_with_ids_both_vn').replace('.png', '.txt').replace('.jpg', '.txt')
                 for x in self.img_files[ds]]
 
         freak_labels = []
@@ -456,11 +457,6 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 lb = np.loadtxt(lp)
                 if len(lb) < 1:
                     continue
-                if len(lb.shape) < 2:
-                    img_max = lb[1]
-                    lb = np.expand_dims(lb, axis=0)
-                else:
-                    img_max = np.max(lb[:, 1])
 
                 # full_coords = lb[:, 2:6]
                 # head_coords = lb[:, 6:10]
@@ -481,12 +477,25 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 n_obj = len(lb)
                 if n_obj > self.opt.K:
                     self.label_files[ds].remove(lp)
-                    img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt', '.jpg')
+                    # img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt', '.jpg')
+                    img_path = lp.replace('labels_with_ids_both_vn', 'images').replace('.txt', '.png')
+                    try :
+                        self.img_files[ds].remove(img_path)
+                    except ValueError :
+                        img_path = img_path.replace('.png', '.jpg')
+                        self.img_files[ds].remove(img_path)
                     print(f"Objects in image {lp} exceeds {opt.K}. excluded {img_path} image & label")
-                    self.img_files[ds].remove(img_path)
                     freak_labels.append(lp)
+
+                if len(lb.shape) < 2:
+                    img_max = lb[1]
+                    lb = np.expand_dims(lb, axis=0)
+                else:
+                    img_max = np.max(lb[:, 1])
+
                 if img_max > max_index:
                     max_index = img_max
+
             self.tid_num[ds] = max_index + 1
         print(f'Freaked data : {freak_labels}')
         last_index = 0
