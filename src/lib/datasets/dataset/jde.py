@@ -457,7 +457,11 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 lb = np.loadtxt(lp)
                 if len(lb) < 1:
                     continue
-
+                if len(lb.shape) < 2:
+                    img_max = lb[1]
+                    lb = np.expand_dims(lb, axis=0)
+                else:
+                    img_max = np.max(lb[:, 1])
                 # full_coords = lb[:, 2:6]
                 # head_coords = lb[:, 6:10]
                 # for full_c, head_c in zip(full_coords, head_coords):
@@ -486,12 +490,8 @@ class JointDataset(LoadImagesAndLabels):  # for training
                         self.img_files[ds].remove(img_path)
                     # print(f"Objects in image {lp} exceeds {opt.K}. excluded {img_path} image & label")
                     freak_labels.append(lp)
+                    continue
 
-                if len(lb.shape) < 2:
-                    img_max = lb[1]
-                    lb = np.expand_dims(lb, axis=0)
-                else:
-                    img_max = np.max(lb[:, 1])
 
                 if img_max > max_index:
                     max_index = img_max
