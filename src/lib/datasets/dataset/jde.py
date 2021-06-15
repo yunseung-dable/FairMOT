@@ -534,15 +534,14 @@ class JointDataset(LoadImagesAndLabels):  # for training
         reg_mask = np.zeros((self.max_objs,), dtype=np.uint8)
         ids = np.zeros((self.max_objs,), dtype=np.int64)
         bbox_xys = np.zeros((self.max_objs, 4), dtype=np.float32)
-        bbox_xys = np.zeros((self.max_objs, 4), dtype=np.float32)
 
         draw_gaussian = draw_msra_gaussian if self.opt.mse_loss else draw_umich_gaussian
 
         num_objs = ids_arr.shape[0]
-        print(f'ids_arr : {ids_arr}, bbox_arr shape : {bbox_arr.shape}')
+        print(f'ids_arr : {ids_arr.shape[0]}, bbox_arr shape : {bbox_arr.shape}')
         for k in range(num_objs):
             # label = labels[k]
-
+            print(f'This is k : {k}')
             bbox = bbox_arr[k]
             cls_id = 0
             bbox[[0, 2]] = bbox[[0, 2]] * output_w
