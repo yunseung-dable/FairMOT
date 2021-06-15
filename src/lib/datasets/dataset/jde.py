@@ -572,6 +572,8 @@ class JointDataset(LoadImagesAndLabels):  # for training
                     [bbox[0], bbox[1]], dtype=np.float32)
                 ct_int = ct.astype(np.int32)
                 draw_gaussian(hm[cls_id], ct_int, radius)
+                print(f'once again k is {k}')
+                wh[k]
                 if self.opt.ltrb:
                     # distance from center to lt, from center to rb (w1,h1, w2,h2)
                     wh[k] = ct[0] - bbox_amodal[0], ct[1] - bbox_amodal[1], \
