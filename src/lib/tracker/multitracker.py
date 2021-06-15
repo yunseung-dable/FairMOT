@@ -108,11 +108,12 @@ class STrack(BaseTrack):
         self.frame_id = frame_id
         self.tracklet_len += 1
         # new_tlwh = new_track.tlwh
-        new_tlwh = new_track.full_tlwh
+        new_full_tlwh = new_track.full_tlwh
+        new_head_tlwh = new_track.head_tlwh
         # self._head_tlwh = new_track.head_tlwh
-        self._head_tlwh = new_track._head_tlwh
+        self._head_tlwh = new_head_tlwh
         self.mean, self.covariance = self.kalman_filter.update(
-            self.mean, self.covariance, self.tlwh_to_xyah(new_tlwh))
+            self.mean, self.covariance, self.tlwh_to_xyah(new_full_tlwh))
         self.state = TrackState.Tracked
         self.is_activated = True
 
