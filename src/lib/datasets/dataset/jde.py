@@ -480,6 +480,11 @@ class JointDataset(LoadImagesAndLabels):  # for training
 
                 n_obj = len(lb)
                 if n_obj > self.opt.K:
+                    if lp == '/data/mot/crowdhuman/labels_with_ids_both_vh/train/283647,18df9000aa5f67ce.txt':
+                        print('freaks here')
+                        self.label_files[ds].remove(lp)
+                        print('kill freaks')
+                    print('one more kill?')
                     self.label_files[ds].remove(lp)
                     # img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt', '.jpg')
                     img_path = lp.replace('labels_with_ids_both_vh', 'images').replace('.txt', '.png')
