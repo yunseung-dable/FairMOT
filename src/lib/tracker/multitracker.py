@@ -109,7 +109,8 @@ class STrack(BaseTrack):
         self.tracklet_len += 1
         # new_tlwh = new_track.tlwh
         new_tlwh = new_track.full_tlwh
-        self._head_tlwh = new_track.head_tlwh
+        # self._head_tlwh = new_track.head_tlwh
+        self._head_tlwh = new_track._head_tlwh
         self.mean, self.covariance = self.kalman_filter.update(
             self.mean, self.covariance, self.tlwh_to_xyah(new_tlwh))
         self.state = TrackState.Tracked
@@ -439,7 +440,7 @@ class JDETracker(object):
             track = strack_pool[itracked]
             det = detections[idet]
             if track.state == TrackState.Tracked:
-                track.update(detections[idet], self.frame_id)
+                track.update(det, self.frame_id)
                 activated_starcks.append(track)
             else:
                 track.re_activate(det, self.frame_id, new_id=False)
