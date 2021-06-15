@@ -190,7 +190,7 @@ class LoadImagesAndLabels:  # for training
         if os.path.isfile(label_path):
             # labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 6)
             labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 10)
-            print(f'In __getdata__, The number of labels is : {len(labels0)}, Path : {label_path},')
+            # print(f'In __getdata__, The number of labels is : {len(labels0)}, Path : {label_path},')
             # Normalized xywh to pixel xyxy format
             labels = labels0.copy()
             labels[:, 2] = ratio * w * (labels0[:, 2] - labels0[:, 4] / 2) + padw
@@ -537,7 +537,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
         draw_gaussian = draw_msra_gaussian if self.opt.mse_loss else draw_umich_gaussian
 
         num_objs = ids_arr.shape[0]
-        print(f'ids_arr : {ids_arr.shape[0]}, bbox_arr shape : {bbox_arr.shape}')
+        # print(f'ids_arr : {ids_arr.shape[0]}, bbox_arr shape : {bbox_arr.shape}')
         for k in range(num_objs):
             # label = labels[k]
             bbox = bbox_arr[k]
