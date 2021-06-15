@@ -452,32 +452,8 @@ class JointDataset(LoadImagesAndLabels):  # for training
         freak_labels = []
         for ds, label_paths in self.label_files.items():
             max_index = -1
+            label_paths = list(label_paths)
             for lp in label_paths:
-                print(lp)
-                if lp == '/data/mot/crowdhuman/labels_with_ids_both_vh/train/283647,18df9000aa5f67ce.txt':
-                    print('freaks here')
-                    lb = np.loadtxt(lp)
-
-                    if len(lb) < 1:
-                        continue
-                    if len(lb.shape) < 2:
-                        img_max = lb[1]
-                        lb = np.expand_dims(lb, axis=0)
-                    else:
-                        img_max = np.max(lb[:, 1])
-
-                    n_obj = len(lb)
-                    print('n_obj : ', n_obj)
-                    if n_obj > self.opt.K:
-                        print('came in max obj if phase')
-                        self.label_files[ds].remove(lp)
-                        print('remove finish')
-
-
-
-
-
-
                 lb = np.loadtxt(lp)
                 if len(lb) < 1:
                     continue
@@ -515,7 +491,6 @@ class JointDataset(LoadImagesAndLabels):  # for training
                     # print(f"Objects in image {lp} exceeds {opt.K}. excluded {img_path} image & label")
                     freak_labels.append(lp)
                     continue
-
 
                 if img_max > max_index:
                     max_index = img_max
