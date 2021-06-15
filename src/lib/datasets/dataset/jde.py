@@ -481,7 +481,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
                     img_path = lp.replace('labels_with_ids_both_vn', 'images').replace('.txt', '.png')
                     try :
                         self.img_files[ds].remove(img_path)
-                    except ValueError :
+                    except  :
                         img_path = img_path.replace('.png', '.jpg')
                         self.img_files[ds].remove(img_path)
                     print(f"Objects in image {lp} exceeds {opt.K}. excluded {img_path} image & label")
