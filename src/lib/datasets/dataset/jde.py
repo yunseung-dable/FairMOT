@@ -484,7 +484,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
                         print('freaks here')
                         self.label_files[ds].remove(lp)
                         print('kill freaks')
-                    print('one more kill?')
+                        print('one more kill?')
                     self.label_files[ds].remove(lp)
                     # img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt', '.jpg')
                     img_path = lp.replace('labels_with_ids_both_vh', 'images').replace('.txt', '.png')
