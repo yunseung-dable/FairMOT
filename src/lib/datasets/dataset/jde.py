@@ -603,8 +603,8 @@ class JointDataset(LoadImagesAndLabels):  # for training
             if labels[i, 1] > -1:
                 labels[i, 1] += self.tid_start_index[ds]
 
-        output_h = imgs.shape[1] // self.opt.down_ratio
-        output_w = imgs.shape[2] // self.opt.down_ratio
+        output_h = imgs.shape[0] // self.opt.down_ratio
+        output_w = imgs.shape[1] // self.opt.down_ratio
         num_classes = self.num_classes
         num_objs = labels.shape[0]
 
