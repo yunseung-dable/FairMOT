@@ -713,11 +713,6 @@ class JointDataset(LoadImagesAndLabels):  # for training
         head_hm, head_reg_mask, head_ind, head_wh, head_reg, _, head_bbox_xys = self.preprocess_before_get(labels[:, 1], labels[:, 2:6], output_h, output_w )
         full_hm, full_reg_mask, full_ind, full_wh, full_reg,  ids, full_bbox_xys = self.preprocess_before_get(labels[:, 1], labels[:, 6:10], output_h, output_w)
 
-        print(f'head_hm sum : {head_hm.sum()}')
-        print(f'head_hm shape : {head_hm.shape}')
-        print(f'head_ind : {head_ind}')
-
-
 
         ret = {'input': imgs,
                'head_hm': head_hm,
