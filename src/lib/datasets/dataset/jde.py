@@ -162,7 +162,7 @@ class LoadImagesAndLabels:  # for training
         if img is None:
             raise ValueError('File corrupt {}'.format(img_path))
         augment_hsv = True
-        augment_hsv = False
+        # augment_hsv = False
         if self.augment and augment_hsv:
             # SV augmentation by 50%
             fraction = 0.50
