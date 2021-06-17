@@ -88,7 +88,8 @@ class STrack(BaseTrack):
         self.mean, self.covariance = self.kalman_filter.update(
             self.mean, self.covariance, self.tlwh_to_xyah(new_track.full_tlwh)
         )
-
+        new_head_tlwh = new_track.head_tlwh
+        self._head_tlwh = new_head_tlwh
         self.update_features(new_track.curr_feat)
         self.tracklet_len = 0
         self.state = TrackState.Tracked
