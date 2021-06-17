@@ -50,7 +50,7 @@ class MotLoss(torch.nn.Module):
                 wh_loss += self.crit_reg(
                     output['head_wh'], batch['head_reg_mask'], batch['head_ind'], batch['head_wh']) / opt.num_stacks
                 wh_loss += self.crit_reg(
-                    output['full_wh'], batch['full_reg_mask'],batch['full_ind'], batch['full_wh']) / opt.num_stacks
+                    output['full_wh'], batch['full_reg_mask'], batch['full_ind'], batch['full_wh']) / opt.num_stacks
             if opt.reg_offset and opt.off_weight > 0:
                 off_loss += self.crit_reg(output['head_reg'], batch['head_reg_mask'],batch['head_ind'], batch['head_reg']) / opt.num_stacks
                 off_loss += self.crit_reg(output['full_reg'], batch['full_reg_mask'],batch['full_ind'], batch['full_reg']) / opt.num_stacks
@@ -69,7 +69,9 @@ class MotLoss(torch.nn.Module):
         det_loss = opt.hm_weight * hm_loss + opt.wh_weight * wh_loss + opt.off_weight * off_loss
 
         loss = torch.exp(-self.s_det) * det_loss + torch.exp(-self.s_id) * id_loss + (self.s_det + self.s_id)
-        loss *= 0.5
+        # loss *= 0.5
+
+        loss = det_loss + 0.1 * id_loss
 
         loss_stats = {'loss': loss, 'hm_loss': hm_loss,
                       'wh_loss': wh_loss, 'off_loss': off_loss, 'id_loss': id_loss}
