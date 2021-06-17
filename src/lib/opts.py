@@ -69,7 +69,7 @@ class opts(object):
                              help='input width. -1 for default from dataset.')
     
     # train
-    self.parser.add_argument('--lr', type=float, default=1e-4,
+    self.parser.add_argument('--lr', type=float, default=1e-5,
                              help='learning rate for batch size 12.')
     self.parser.add_argument('--lr_step', type=str, default='20',
                              help='drop learning rate by 10.')
