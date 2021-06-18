@@ -15,6 +15,18 @@ def gen_ann_list(file_list, ann_root):
 		    files.append( os.path.join(ann_root, file.strip()+'.json') )
     return files
 
+
+def process_nonprovide_box(label):
+    fill_dict = {'x': -1, 'y': -1, 'width': -1, 'height': -1}
+    if label['head'] == {}:
+        label['head'] = fill_dict
+
+    elif label['visible'] == {}:
+        label['visible'] = fill_dict
+
+    return label
+
+
 def write_to_text(img_width: int, 
                   img_height: int, 
                   labels: dict, 
@@ -32,6 +44,8 @@ def write_to_text(img_width: int,
     """
     
     for i in labels.keys(): # for each object
+        labels[i] = process_nonprovide_box(labels[i])
+
         tid_curr = labels[i]['tid_curr']
         
         hbox_x = labels[i]['head']['x']
