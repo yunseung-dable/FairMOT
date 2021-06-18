@@ -477,7 +477,7 @@ class DLASeg(nn.Module):
 
         y = []
         for i in range(self.last_level - self.first_level):
-            y.append(x[i].detach().clone())
+            y.append(x[i].clone())
         self.ida_up(y, 0, len(y))
 
         z = {}
