@@ -102,7 +102,7 @@ def gen_labels_david(file_list, label_root, ann_root):
             mode = anns[j]['classification']['code'] # head or visible
 
             if person_id not in labels.keys():
-                labels[person_id] = dict([(key, dict()) for key in ['head_box', 'visible_box', 'tid_curr']])
+                labels[person_id] = dict([(key, dict()) for key in ['head', 'visible', 'tid_curr']])
                 tid_curr += 1 # 1부터 시작
             
             labels[person_id][mode] = anns[j]['label']['data']
