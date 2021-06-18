@@ -112,7 +112,6 @@ def gen_labels_david(file_list, label_root, ann_root):
 
         for j in range(len(anns)): # each object(head or visible)
             person_id = anns[j]['classification']['attributes'][0]['value'] if anns[j]['classification']['attributes'][0]['code'] == 'id' else anns[j]['classification']['attributes'][1]['value'] 
-            person_id = int(person_id)
             mode = anns[j]['classification']['code'] # head or visible
 
             if person_id not in labels.keys():
