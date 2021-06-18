@@ -31,21 +31,21 @@ def write_to_text(img_width: int,
     }
     """
     
-    for label in labels: # for each object
-        tid_curr = label['tid_curr']
+    for i in labels.keys(): # for each object
+        tid_curr = labels[i]['tid_curr']
         
-        hbox_x = label['head']['x']
-        hbox_y = label['head']['y']
-        hbox_w = label['head']['width']
-        hbox_h = label['head']['height']
+        hbox_x = labels[i]['head']['x']
+        hbox_y = labels[i]['head']['y']
+        hbox_w = labels[i]['head']['width']
+        hbox_h = labels[i]['head']['height']
 
         hbox_x += hbox_w / 2 # center x
         hbox_y += hbox_h / 2 # center y
 
-        vbox_x = label['visible']['x']
-        vbox_y = label['visible']['y']
-        vbox_w = label['visible']['width']
-        vbox_h = label['visible']['height']
+        vbox_x = labels[i]['visible']['x']
+        vbox_y = labels[i]['visible']['y']
+        vbox_w = labels[i]['visible']['width']
+        vbox_h = labels[i]['visible']['height']
 
         vbox_x += vbox_w / 2 # center x
         vbox_y += vbox_h / 2 # center y
