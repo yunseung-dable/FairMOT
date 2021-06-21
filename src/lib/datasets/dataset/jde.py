@@ -21,6 +21,8 @@ from opts import opts
 from utils.image import gaussian_radius, draw_umich_gaussian, draw_msra_gaussian
 from utils.utils import xyxy2xywh, generate_anchors, xywh2xyxy, encode_delta
 
+import warnings
+
 
 class LoadImages:  # for inference
     def __init__(self, path, img_size=(1088, 608)):
@@ -238,9 +240,12 @@ class LoadImagesAndLabels:  # for training
 
         # Load labels
         if os.path.isfile(label_path):
-            # labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 6)
-            labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 10)
-            # print(f'In __getdata__, The number of labels is : {len(labels0)}, Path : {label_path},')
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                # labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 6)
+                labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 10)
+                # print(f'In __getdata__, The number of labels is : {len(labels0)}, Path : {label_path},')
+            
             # Normalized xywh to pixel xyxy format
             labels = labels0.copy()
             labels[:, 2] = ratio * w * (labels0[:, 2] - labels0[:, 4] / 2) + padw
