@@ -75,8 +75,7 @@ def write_to_text(img_width: int,
 def gen_labels_david(file_list, label_root, ann_root):
     """
     file_list: DAVID_893/*.txt
-    data_root: DAVID_893/images/
-    label_root: DAVID_893/labels_with_id/ -> 생성
+    label_root: DAVID_893/labels_with_id_both/ -> 생성
     ann_root: DAVID_893/jsons
     """
     mkdirs(label_root)
@@ -125,8 +124,8 @@ def gen_labels_david(file_list, label_root, ann_root):
  
 if __name__ == '__main__':
     ann_root = '/mnt/sda1/user/data/DAVID_893/jsons'
-    label_root_train = '/mnt/sda1/user/data/DAVID_893/labels_with_ids/train'
-    label_root_val = '/mnt/sda1/user/data/DAVID_893/labels_with_ids/val'
+    label_root_train = '/mnt/sda1/user/data/DAVID_893/labels_with_ids_both/train'
+    label_root_val = '/mnt/sda1/user/data/DAVID_893/labels_with_ids_both/val'
     file_list_train = '/mnt/sda1/user/data/DAVID_893/train.txt'
     file_list_val = '/mnt/sda1/user/data/DAVID_893/val.txt'
     
