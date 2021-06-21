@@ -1,5 +1,5 @@
 {
-	"root":"/data/DAVID_893",
+	"root":"/data/vv-FairMOT/data",
 	"train":
 	{
 	    "david893_train":"./data/david_893.train"
