@@ -68,6 +68,18 @@ def gen_data_path_mot17_emb(root_path):
     f.close()
 
 
+def gen_david893_path(root_path, mode):
+    david_path = f'DAVID_893/images/{mode}/'
+    with open(os.path.join(root_path, f'DAVID_893/{mode}.txt')) as f:
+        images = f.readlines()
+        f2 = open(f'/home/hyeseung/vv-FairMOT/src/data/david_893.{mode}', 'w')
+        for img in images:
+            f2.write( david_path + img.strip() + ".jpg\n" )
+        f2.close()
+    f.close()
+
+
 if __name__ == '__main__':
-    root = '/data/yfzhang/MOT/JDE'
-    gen_data_path_mot17_emb(root)
+    root = '/mnt/sda1/user/data'
+    gen_david893_path(root, mode = 'train')
+    gen_david893_path(root, mode = 'val')
