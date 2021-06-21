@@ -5,6 +5,6 @@ from Cython.Build import cythonize
 import numpy
 
 setup(
-    ext_modules = cythonize("matching_bbox.pyx"),
+    ext_modules = cythonize("bbox_mathing.pyx"),
     include_dirs = [numpy.get_include()]
 )
