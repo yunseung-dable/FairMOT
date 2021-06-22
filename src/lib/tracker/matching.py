@@ -69,7 +69,7 @@ def ious(atlbrs, btlbrs):
     return ious
 
 def bbox_matching(atlbrs,btlbrs):
-    conf_mat = np.zeros((len(atlbrs), len(btlbrs)), dtype=np.float64)
+    conf_mat = np.zeros((len(atlbrs), len(btlbrs)), dtype=np.float32)
     if conf_mat.size == 0:
         return conf_mat
     
@@ -97,6 +97,22 @@ def bbox_matching(atlbrs,btlbrs):
                     conf_mat[h,v] = iw * ih / head_area
     
     return conf_mat
+
+def bbox_singlematching(visible,head):
+    overlap = 0
+
+    vt,vl,vb,vr = visible
+    ht,hl,hb,hr = head
+    head_area = (hb - ht) * (hr - hl)
+    
+    
+    iw = (min(hb,vb) - max(ht,vt) + 1)
+    if iw > 0:
+        ih = (min(hr,vr) - max(hl,vl) + 1)
+        if ih > 0:
+           overlap = iw*ih/head_area
+    return overlap
+
 
 
 def iou_distance(atracks, btracks):
