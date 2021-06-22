@@ -3,9 +3,8 @@ import os
 import cv2
 import json
 
-def mkdirs(d):
-    if not osp.exists(d):
-        os.makedirs(d)
+def mkdirs(path):
+    os.makedirs(path, exist_ok=True)
 
 
 def gen_ann_list(file_list, ann_root):
