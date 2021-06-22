@@ -7,12 +7,12 @@ def mkdirs(path):
     os.makedirs(path, exist_ok=True)
 
 
-def gen_ann_list(file_list, ann_root):
-    files = []
-    with open(file_list, 'r') as f:
+def create_annot_file_list(file_path_txt, annot_root):
+    annot_file_path = []
+    with open(file_path_txt, 'r') as f:
 	    for file in f.readlines():
-		    files.append( os.path.join(ann_root, file.strip()+'.json') )
-    return files
+		    annot_file_path.append( os.path.join(annot_root, file.strip()+'.json') )
+    return annot_file_path
 
 
 def process_nonprovide_box(label):
@@ -80,7 +80,7 @@ def gen_labels_david(file_list, label_root, ann_root):
     mkdirs(label_root)
 
     # generate train or val list 
-    anns_data = gen_ann_list(file_list, ann_root)
+    anns_data = create_annot_file_list(file_list, ann_root)
 
     tid_curr = 0
     for i, ann_data in enumerate(anns_data): # each json file
