@@ -17,7 +17,7 @@ from tracking_utils.kalman_filter import KalmanFilter
 from models import *
 from tracker import matching
 from .basetrack import BaseTrack, TrackState
-from utils import bbox_matching
+from utils.bbox_matching import bbox_matching
 from utils.post_process import ctdet_post_process
 from utils.image import get_affine_transform
 from models.utils import _tranpose_and_gather_feat
@@ -340,6 +340,8 @@ class JDETracker(object):
         # print(f'head_dets shape : {head_dets.shape}')
 
 
+        
+        # # YS Code Start
         head_dets = self.post_process(head_dets, meta)[1]
         full_dets = self.post_process(full_dets, meta)[1]
 
@@ -350,51 +352,83 @@ class JDETracker(object):
         full_dets = full_dets[remain_inds]
         id_feature = id_feature[remain_inds]
 
-        if len(head_dets) > 0 and len(full_dets) > 0:
-
-            # ed_normalize = ed_mat / (np.linalg.norm(ed_mat, axis=1) + 10e-4)
-            # ed_minus = 1 - ed_normalize
-            # dist_argmin = np.argmin(ed_mat, axis=1)
-
-            iou_mat = matching.ious(full_dets, head_dets)
-            # iou_mat = iou_mat / (np.linalg.norm(iou_mat, axis=1) + 10e-4)
-            # ed_iou_mat = ed_minus * iou_mat
-
-            # max_value_axis1 = np.max(ed_iou_mat, axis=1)
-            max_value_axis1 = np.max(iou_mat, axis=1)
-            over_zero_idx = np.where(max_value_axis1 >0, True, False)
-            full_dets_over_zero = full_dets[over_zero_idx]
-            id_feature = id_feature[over_zero_idx]
-
-            # max_value_axis0 = np.max(ed_iou_mat, axis=0)
-            max_value_axis0 = np.max(iou_mat, axis=0)
-            over_zero_idx = np.where(max_value_axis0 >0, True, False)
-            head_dets_over_zero = head_dets[over_zero_idx]
-            #
-            if len(head_dets_over_zero) > 0 and len(full_dets_over_zero) > 0:
-
-                full_xyt = self.get_xyt(full_dets_over_zero)
-                head_xyt = self.get_xyt(head_dets_over_zero)
-                ed_mat = metrics.pairwise.euclidean_distances(full_xyt,
-                                                              head_xyt)  # only compute distances btw left top point
+        ## JG Code Start
+        if len(full_dets)>0:
+            if len(head_dets)>0:
+                bbox_mat = matching.bbox_matching(head_dets,full_dets)
+                
+                full_xyt = self.get_xyt(full_dets)
+                head_xyt = self.get_xyt(head_dets)
+                ed_mat = metrics.pairwise.euclidean_distances(full_xyt, head_xyt)
                 ed_minus = 1 - ed_mat / np.sqrt(width ** 2 + height ** 2)
 
-                iou_res2 = matching.ious(full_dets_over_zero, head_dets_over_zero)
-                iou_filtered = np.where(iou_res2 > 0, 1, 0)
-                ed_iou_mat = ed_minus * iou_filtered
-                argmax = np.argmax(ed_iou_mat, axis=1)
-                #
-                sorted_head_dets = head_dets_over_zero[argmax]
+                ed_bbox_mat = ed_minus * np.transpose(bbox_mat)
 
-                # dets = self.merge_outputs([dets])[1]
-                # dets = self.merge_outputs_both(full_dets, head_dets)
-                dets = self.merge_outputs_both(full_dets_over_zero, sorted_head_dets)
-
+                matched_head = head_dets[np.argmax(ed_bbox_mat, axis=1)]
+                dets = self.merge_outputs_both(full_dets, matched_head)
+                
             else:
-                dets = []
-
+                head_dets = np.ones(full_dets.shape) * -1
+                dets = self.merge_outputs_both(full_dets, head_dets)
+        elif len(head_dets)>0:
+            full_dets = np.ones(head_dets.shape) * -1
+            dets = self.merge_outputs_both(full_dets, head_dets)
         else:
             dets = []
+
+        ## JG Code End
+                
+                
+        # if len(head_dets) > 0 and len(full_dets) > 0:
+
+        #     # ed_normalize = ed_mat / (np.linalg.norm(ed_mat, axis=1) + 10e-4)
+        #     # ed_minus = 1 - ed_normalize
+        #     # dist_argmin = np.argmin(ed_mat, axis=1)
+
+        #     # iou_mat = matching.ious(full_dets,head_dets)
+        #     iou_mat = matching.bbox_matching(head_dets,full_dets)
+        #     # iou_mat = iou_mat / (np.linalg.norm(iou_mat, axis=1) + 10e-4)
+        #     # ed_iou_mat = ed_minus * iou_mat
+
+        #     # max_value_axis1 = np.max(ed_iou_mat, axis=1)
+        #     max_value_axis1 = np.max(iou_mat, axis=1)
+        #     over_zero_idx = np.where(max_value_axis1 >0, True, False)
+        #     full_dets_over_zero = full_dets[over_zero_idx]
+        #     id_feature = id_feature[over_zero_idx]
+
+        #     # max_value_axis0 = np.max(ed_iou_mat, axis=0)
+        #     max_value_axis0 = np.max(iou_mat, axis=0)
+        #     over_zero_idx = np.where(max_value_axis0 >0, True, False)
+        #     head_dets_over_zero = head_dets[over_zero_idx]
+        #     #
+        #     if len(head_dets_over_zero) > 0 and len(full_dets_over_zero) > 0:
+
+        #         full_xyt = self.get_xyt(full_dets_over_zero)
+        #         head_xyt = self.get_xyt(head_dets_over_zero)
+        #         ed_mat = metrics.pairwise.euclidean_distances(full_xyt,
+        #                                                       head_xyt)  # only compute distances btw left top point
+        #         ed_minus = 1 - ed_mat / np.sqrt(width ** 2 + height ** 2)
+
+        #         # iou_res2 = matching.ious(full_dets_over_zero,head_dets_over_zero)
+        #         iou_res2 = matching.bbox_matching(head_dets_over_zero,full_dets_over_zero)
+        #         iou_filtered = np.where(iou_res2 > 0, 1, 0)
+        #         ed_iou_mat = ed_minus * iou_filtered
+        #         argmax = np.argmax(ed_iou_mat, axis=1)
+        #         #
+        #         sorted_head_dets = head_dets_over_zero[argmax]
+
+        #         # dets = self.merge_outputs([dets])[1]
+        #         # dets = self.merge_outputs_both(full_dets, head_dets)
+        #         dets = self.merge_outputs_both(full_dets_over_zero, sorted_head_dets)
+
+        #     else:
+        #         dets = []
+
+        # else:
+        #     dets = []
+
+        # #YS Code End
+
         # consider only full conf
         # remain_inds = dets[:, 4] > self.opt.conf_thres
         # dets = dets[remain_inds]

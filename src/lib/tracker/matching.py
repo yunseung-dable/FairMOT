@@ -3,7 +3,6 @@ import numpy as np
 import scipy
 import lap
 from scipy.spatial.distance import cdist
-
 from cython_bbox import bbox_overlaps as bbox_ious
 from tracking_utils import kalman_filter
 import time
@@ -68,6 +67,36 @@ def ious(atlbrs, btlbrs):
     )
 
     return ious
+
+def bbox_matching(atlbrs,btlbrs):
+    conf_mat = np.zeros((len(atlbrs), len(btlbrs)), dtype=np.float64)
+    if conf_mat.size == 0:
+        return conf_mat
+    
+    head_boxes = np.ascontiguousarray(atlbrs, dtype=np.float)
+    visible_boxes = np.ascontiguousarray(btlbrs, dtype=np.float)
+    hlen = len(head_boxes)
+    vlen = len(visible_boxes)
+    
+    for h in range(hlen):
+        head_area = (
+            (head_boxes[h, 2] - head_boxes[h, 0] + 1) *
+            (head_boxes[h, 3] - head_boxes[h, 1] + 1)
+        )
+        for v in range(vlen):
+            iw = (
+                min(head_boxes[h, 2], visible_boxes[v, 2]) -
+                max(head_boxes[h, 0], visible_boxes[v, 0]) + 1
+            )
+            if iw > 0:
+                ih = (
+                    min(head_boxes[h, 3], visible_boxes[v, 3]) -
+                    max(head_boxes[h, 1], visible_boxes[v, 1]) + 1
+                )
+                if ih > 0:
+                    conf_mat[h,v] = iw * ih / head_area
+    
+    return conf_mat
 
 
 def iou_distance(atracks, btracks):
