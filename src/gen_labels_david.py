@@ -106,19 +106,19 @@ def gen_labels_david(file_list, label_root, ann_root):
         # label dictionary per an image
         labels = dict()
 
-        for j in range(len(anns)): # each object(head or visible)
-            attributes = anns[j]['classification']['attributes'] 
+        for ann in anns: # each object(head or visible)
+            attributes = ann['classification']['attributes'] 
             if attributes[0]['code'] == 'id':
                 person_id = attributes[0]['value']
             else:
                person_id = attributes[1]['value'] 
-            mode = anns[j]['classification']['code'] # head or visible
+            mode = ann['classification']['code'] # head or visible
 
             if person_id not in labels.keys():
                 labels[person_id] = dict([(key, dict()) for key in ['head', 'visible']])
                 overall_person_id += 1 # 1부터 시작
             
-            labels[person_id][mode] = anns[j]['label']['data']
+            labels[person_id][mode] = ann['label']['data']
             labels[person_id]['overall_person_id'] = overall_person_id
 
         write_to_text(img_width, img_height, labels, label_fpath)
