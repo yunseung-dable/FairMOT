@@ -36,7 +36,7 @@ def write_to_text(img_width: int,
         1: {
             'head': { 'x': 862, 'y': 94,  'width': 15, 'height': 58 }, 
             'visible': { 'x': 866, 'y': 93, 'width': 10, 'height': 13 },
-            'tid_curr': 1
+            'overall_person_id': 1
             },
         ...
     }
@@ -45,7 +45,7 @@ def write_to_text(img_width: int,
     for i in labels.keys(): # for each object
         labels[i] = process_nonprovide_box(labels[i])
 
-        tid_curr = labels[i]['tid_curr']
+        overall_person_id = labels[i]['overall_person_id']
         
         hbox_x = labels[i]['head']['x']
         hbox_y = labels[i]['head']['y']
@@ -64,7 +64,7 @@ def write_to_text(img_width: int,
         vbox_y += vbox_h / 2 # center y
 
         label_str = '0 {:d} {:.6f} {:.6f} {:.6f} {:.6f} {:.6f} {:.6f} {:.6f} {:.6f}\n'.format(
-                tid_curr, hbox_x / img_width, hbox_y / img_height, hbox_w / img_width, hbox_h / img_height, 
+                overall_person_id, hbox_x / img_width, hbox_y / img_height, hbox_w / img_width, hbox_h / img_height, 
                 vbox_x / img_width, vbox_y / img_height, vbox_w / img_width, vbox_h / img_height)
 
         with open(label_fpath, 'a') as f:
@@ -82,7 +82,7 @@ def gen_labels_david(file_list, label_root, ann_root):
     # generate train or val list 
     anns_data = create_annot_file_list(file_list, ann_root)
 
-    tid_curr = 0
+    overall_person_id = 0
     for i, ann_data in enumerate(anns_data): # each json file
         # read image
         img_path = ann_data.replace('jsons', 'images').replace('.json', '.jpg')
@@ -114,10 +114,10 @@ def gen_labels_david(file_list, label_root, ann_root):
 
             if person_id not in labels.keys():
                 labels[person_id] = dict([(key, dict()) for key in ['head', 'visible']])
-                tid_curr += 1 # 1부터 시작
+                overall_person_id += 1 # 1부터 시작
             
             labels[person_id][mode] = anns[j]['label']['data']
-            labels[person_id]['tid_curr'] = tid_curr
+            labels[person_id]['overall_person_id'] = overall_person_id
 
         write_to_text(img_width, img_height, labels, label_fpath)
  
