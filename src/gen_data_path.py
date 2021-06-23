@@ -72,7 +72,7 @@ def gen_david893_path(root_path, mode):
     david_path = f'DAVID_893/images/{mode}/'
     with open(os.path.join(root_path, f'DAVID_893/{mode}.txt')) as f:
         images = f.readlines()
-        f2 = open(f'/home/hyeseung/vv-FairMOT/src/data/david_893.{mode}', 'w')
+        f2 = open(f'/home/hyeseung/vv-FairMOT/src/data/david_893_{mode}.txt', 'w')
         for img in images:
             f2.write( david_path + img.strip() + ".jpg\n" )
         f2.close()
