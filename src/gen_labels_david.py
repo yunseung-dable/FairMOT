@@ -124,11 +124,12 @@ def gen_labels_david(file_list, label_root, ann_root):
         write_to_text(img_width, img_height, labels, label_fpath)
  
 if __name__ == '__main__':
-    ann_root = '/mnt/sda1/user/data/DAVID_893/jsons'
-    label_root_train = '/mnt/sda1/user/data/DAVID_893/labels_with_ids_both/train'
-    label_root_val = '/mnt/sda1/user/data/DAVID_893/labels_with_ids_both/val'
-    file_list_train = '/mnt/sda1/user/data/DAVID_893/train.txt'
-    file_list_val = '/mnt/sda1/user/data/DAVID_893/val.txt'
+    root_dir = '/mnt/sda1/user/data/DAVID_893'
+    ann_root = f'{root_dir}/jsons'
+    train_label_dir = f'{root_dir}/labels_with_ids_both/train'
+    val_label_dir = f'{root_dir}/labels_with_ids_both/val'
+    train_file_list = f'{root_dir}/train.txt'
+    val_file_list = f'{root_dir}/val.txt'
     
-    gen_labels_david(file_list_train, label_root_train, ann_root)
-    gen_labels_david(file_list_val, label_root_val, ann_root)
+    gen_labels_david(train_file_list, train_label_dir, ann_root)
+    gen_labels_david(val_file_list, val_label_dir, ann_root)
