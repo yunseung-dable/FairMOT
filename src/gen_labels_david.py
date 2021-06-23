@@ -8,11 +8,11 @@ def mkdirs(path):
 
 
 def create_annot_file_list(file_path_txt, annot_root):
-    annot_file_path_list = []
-    with open(file_path_txt, 'r') as f:
-	    for annot_file_path in f.readlines():
-		    annot_file_path_list.append( os.path.join(annot_root, annot_file_path.strip()+'.json') )
-    return annot_file_path_list
+	annot_file_path_list = []
+	with open(file_path_txt, 'r') as f:
+		for annot_file_path in f.readlines():
+			annot_file_path_list.append( os.path.join(annot_root, f"{annot_file_path.strip()}.json") )
+	return annot_file_path_list
 
 
 def process_nonprovide_box(label):
