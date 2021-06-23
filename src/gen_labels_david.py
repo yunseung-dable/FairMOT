@@ -63,9 +63,7 @@ def write_to_text(img_width: int,
         vbox_x += vbox_w / 2 # center x
         vbox_y += vbox_h / 2 # center y
 
-        label_str = '0 {:d} {:.6f} {:.6f} {:.6f} {:.6f} {:.6f} {:.6f} {:.6f} {:.6f}\n'.format(
-                overall_person_id, hbox_x / img_width, hbox_y / img_height, hbox_w / img_width, hbox_h / img_height, 
-                vbox_x / img_width, vbox_y / img_height, vbox_w / img_width, vbox_h / img_height)
+        label_str = f'0 {overall_person_id :d} {hbox_x / img_width :.6f} {hbox_y / img_height :.6f} {hbox_w / img_width :.6f} {hbox_h / img_height :.6f} {vbox_x / img_width :.6f} {vbox_y / img_height :.6f} {vbox_w / img_width :.6f} {vbox_h / img_height :.6f}\n'
 
         with open(label_fpath, 'a') as f:
             f.write(label_str)
