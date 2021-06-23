@@ -96,11 +96,11 @@ def gen_labels_david(file_list, label_root, ann_root):
 
         # touch label-file
         label_fpath = os.path.join(label_root, os.path.basename(img_path).replace('.jpg', '.txt'))
-        f = open(label_fpath, 'w')
-        f.close()
 
-        # empty check
-        if len(anns) == 0:
+        # for negative samples
+        if len(anns) == 0:   
+            f = open(label_fpath, 'w')
+            f.close()
             continue
         
         # label dictionary per an image
