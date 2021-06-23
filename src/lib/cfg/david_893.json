@@ -2,11 +2,11 @@
 	"root":"/data/vv-FairMOT/data",
 	"train":
 	{
-	    "david893_train":"./data/david_893.train"
+	    "david893_train":"./data/david_893_train.txt"
 	},
 	"valid":
 	{
-	    "david893_test":"./data/david_893.val"
+	    "david893_test":"./data/david_893_val.txt"
 	},
 	"test_emb":
 	{
