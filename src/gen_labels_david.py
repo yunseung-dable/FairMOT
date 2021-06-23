@@ -33,7 +33,7 @@ def write_to_text(img_width: int,
     """
     labels: 
     {
-        1: {
+        '1': {
             'head': { 'x': 862, 'y': 94,  'width': 15, 'height': 58 }, 
             'visible': { 'x': 866, 'y': 93, 'width': 10, 'height': 13 },
             'overall_person_id': 1
@@ -109,7 +109,11 @@ def gen_labels_david(file_list, label_root, ann_root):
         labels = dict()
 
         for j in range(len(anns)): # each object(head or visible)
-            person_id = anns[j]['classification']['attributes'][0]['value'] if anns[j]['classification']['attributes'][0]['code'] == 'id' else anns[j]['classification']['attributes'][1]['value'] 
+            attributes = anns[j]['classification']['attributes'] 
+            if attributes[0]['code'] == 'id':
+                person_id = attributes[0]['value']
+            else:
+               person_id = attributes[1]['value'] 
             mode = anns[j]['classification']['code'] # head or visible
 
             if person_id not in labels.keys():
