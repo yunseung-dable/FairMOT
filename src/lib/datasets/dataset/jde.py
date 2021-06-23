@@ -263,7 +263,10 @@ class LoadImagesAndLabels:  # for training
 
         # Augment image and labels
         if self.augment:
-            img, labels, M = random_affine(img, labels, degrees=(-5, 5), translate=(0.10, 0.10), scale=(0.50, 1.20))
+            if len(labels) > 0:
+                img, labels, M = random_affine(img, labels, degrees=(-5, 5), translate=(0.10, 0.10), scale=(0.50, 1.20))
+            else:
+                img = random_affine(img, labels, degrees=(-5, 5), translate=(0.10, 0.10), scale=(0.50, 1.20))
 
         plotFlag = False
         if plotFlag:
@@ -401,7 +404,7 @@ def random_affine(img, targets=None, degrees=(-10, 10), translate=(.1, .1), scal
                               borderValue=borderValue)  # BGR order borderValue
 
     # Return warped points also
-    if targets is not None:
+    if len(targets) > 0:
         head_points, head_i = random_affine_label(targets[:,2:6], M, a)
         full_points, full_i = random_affine_label(targets[:, 6:10], M, a)
 
