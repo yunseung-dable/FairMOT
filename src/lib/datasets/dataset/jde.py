@@ -21,6 +21,8 @@ from opts import opts
 from utils.image import gaussian_radius, draw_umich_gaussian, draw_msra_gaussian
 from utils.utils import xyxy2xywh, generate_anchors, xywh2xyxy, encode_delta
 
+import warnings
+
 
 class LoadImages:  # for inference
     def __init__(self, path, img_size=(1088, 608)):
@@ -238,9 +240,12 @@ class LoadImagesAndLabels:  # for training
 
         # Load labels
         if os.path.isfile(label_path):
-            # labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 6)
-            labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 10)
-            # print(f'In __getdata__, The number of labels is : {len(labels0)}, Path : {label_path},')
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                # labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 6)
+                labels0 = np.loadtxt(label_path, dtype=np.float32).reshape(-1, 10)
+                # print(f'In __getdata__, The number of labels is : {len(labels0)}, Path : {label_path},')
+            
             # Normalized xywh to pixel xyxy format
             labels = labels0.copy()
             labels[:, 2] = ratio * w * (labels0[:, 2] - labels0[:, 4] / 2) + padw
@@ -258,7 +263,10 @@ class LoadImagesAndLabels:  # for training
 
         # Augment image and labels
         if self.augment:
-            img, labels, M = random_affine(img, labels, degrees=(-5, 5), translate=(0.10, 0.10), scale=(0.50, 1.20))
+            if len(labels) > 0:
+                img, labels, M = random_affine(img, labels, degrees=(-5, 5), translate=(0.10, 0.10), scale=(0.50, 1.20))
+            else:
+                img = random_affine(img, labels, degrees=(-5, 5), translate=(0.10, 0.10), scale=(0.50, 1.20))
 
         plotFlag = False
         if plotFlag:
@@ -396,7 +404,7 @@ def random_affine(img, targets=None, degrees=(-10, 10), translate=(.1, .1), scal
                               borderValue=borderValue)  # BGR order borderValue
 
     # Return warped points also
-    if targets is not None:
+    if len(targets) > 0:
         head_points, head_i = random_affine_label(targets[:,2:6], M, a)
         full_points, full_i = random_affine_label(targets[:, 6:10], M, a)
 
@@ -495,8 +503,8 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 self.img_files[ds] = list(filter(lambda x: len(x) > 0, self.img_files[ds]))
 
             self.label_files[ds] = [
-                # x.replace('images', 'labels_with_ids_both').replace('.png', '.txt').replace('.jpg', '.txt')
-                x.replace('images', 'labels_with_ids_both_vh').replace('.png', '.txt').replace('.jpg', '.txt')
+                x.replace('images', 'labels_with_ids_both').replace('.png', '.txt').replace('.jpg', '.txt')
+                # x.replace('images', 'labels_with_ids_both_vh').replace('.png', '.txt').replace('.jpg', '.txt')
                 for x in self.img_files[ds]]
 
         freak_labels = []
@@ -531,8 +539,8 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 n_obj = len(lb)
                 if n_obj > self.opt.K:
                     self.label_files[ds].remove(lp)
-                    # img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt', '.jpg')
-                    img_path = lp.replace('labels_with_ids_both_vh', 'images').replace('.txt', '.png')
+                    img_path = lp.replace('labels_with_ids_both', 'images').replace('.txt', '.png').replace('.txt', '.jpg')
+                    # img_path = lp.replace('labels_with_ids_both_vh', 'images').replace('.txt', '.png')
                     try :
                         self.img_files[ds].remove(img_path)
                     except  :

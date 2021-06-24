@@ -64,7 +64,8 @@ class MotLoss(torch.nn.Module):
                 id_target = batch['ids'][batch['full_reg_mask'] > 0]
 
                 id_output = self.classifier(id_full).contiguous()
-                id_loss += self.IDLoss(id_output, id_target)
+                if len(id_output) > 0 and len(id_target) > 0:
+                    id_loss += self.IDLoss(id_output, id_target)
 
         det_loss = opt.hm_weight * hm_loss + opt.wh_weight * wh_loss + opt.off_weight * off_loss
 
@@ -72,7 +73,8 @@ class MotLoss(torch.nn.Module):
         # loss *= 0.5
 
         loss = det_loss + 0.1 * id_loss
-
+        if isinstance(id_loss, int):
+            id_loss = torch.tensor(float(id_loss)).cuda()
         loss_stats = {'loss': loss, 'hm_loss': hm_loss,
                       'wh_loss': wh_loss, 'off_loss': off_loss, 'id_loss': id_loss}
         return loss, loss_stats

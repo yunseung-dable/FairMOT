@@ -126,8 +126,8 @@ def gen_labels_david(file_list, label_root, ann_root):
 if __name__ == '__main__':
     root_dir = '/mnt/sda1/user/data/DAVID_893'
     ann_root = f'{root_dir}/jsons'
-    train_label_dir = f'{root_dir}/labels_with_ids_both/train'
-    val_label_dir = f'{root_dir}/labels_with_ids_both/val'
+    train_label_dir = f'{root_dir}/labels_with_ids_both_vh/train'
+    val_label_dir = f'{root_dir}/labels_with_ids_both_vh/val'
     train_file_list = f'{root_dir}/train.txt'
     val_file_list = f'{root_dir}/val.txt'
     
